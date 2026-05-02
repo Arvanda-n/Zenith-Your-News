@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../data/dummy_news.dart';
+import '../models/app_notification.dart';
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
 import 'bookmark_screen.dart';
@@ -8,6 +9,7 @@ import 'detail_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'notification_detail_screen.dart';
 import 'notification_screen.dart';
 import 'profile_screen.dart';
 import 'search_screen.dart';
@@ -41,10 +43,29 @@ class _RootShellState extends State<RootShell> {
     );
   }
 
+  void _openNotificationDetail(
+    AppNotification notification,
+    NewsItem? relatedNews,
+  ) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => NotificationDetailScreen(
+          notification: notification,
+          relatedNews: relatedNews,
+          onOpenDetail: _openDetail,
+        ),
+      ),
+    );
+  }
+
   void _openNotifications() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => NotificationScreen(controller: widget.controller),
+        builder: (_) => NotificationScreen(
+          controller: widget.controller,
+          news: dummyNews,
+          onOpenNotification: _openNotificationDetail,
+        ),
       ),
     );
   }

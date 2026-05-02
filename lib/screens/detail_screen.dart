@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
+import '../widgets/news_image.dart';
 
 class DetailScreen extends StatelessWidget {
   const DetailScreen({super.key, required this.controller, required this.item});
@@ -42,25 +43,11 @@ class DetailScreen extends StatelessWidget {
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Container(
+              NewsImage(
+                imageUrl: item.imageUrl,
+                imageHint: item.imageHint,
                 height: 220,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF4F46E5), Color(0xFF111827)],
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  item.imageHint,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                borderRadius: BorderRadius.circular(14),
               ),
               const SizedBox(height: 16),
               Text(

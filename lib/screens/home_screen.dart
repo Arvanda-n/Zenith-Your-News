@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
+import '../widgets/news_image.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -151,36 +152,39 @@ class _FeaturedCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Ink(
         width: 300,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF4F46E5), Color(0xFF1F2937)],
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Chip(
-                label: Text(item.category),
-                visualDensity: VisualDensity.compact,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            NewsImage(
+              imageUrl: item.imageUrl,
+              imageHint: item.imageHint,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Chip(
+                    label: Text(item.category),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  const Spacer(),
+                  Text(
+                    item.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              Text(
-                item.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -207,21 +211,12 @@ class _NewsTile extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              Container(
+              NewsImage(
+                imageUrl: item.imageUrl,
+                imageHint: item.imageHint,
                 width: 86,
                 height: 86,
-                decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  item.imageHint,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 11),
-                ),
+                borderRadius: BorderRadius.circular(12),
               ),
               const SizedBox(width: 12),
               Expanded(

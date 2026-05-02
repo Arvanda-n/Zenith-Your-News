@@ -25,18 +25,21 @@ class AppController extends ChangeNotifier {
       title: 'Breaking News',
       message: 'AI Bantu Produktivitas Tim Jarak Jauh Meningkat 2x Lipat',
       timestamp: DateTime(2026, 4, 28, 8, 30),
+      newsId: 'n1',
     ),
     AppNotification(
       id: 'ntf-2',
       title: 'Trending Update',
       message: 'Ekonomi Hijau Dorong Investasi Baru di Asia Tenggara',
       timestamp: DateTime(2026, 4, 28, 7, 10),
+      newsId: 'n2',
     ),
     AppNotification(
       id: 'ntf-3',
       title: 'Daily Digest',
       message: '5 berita baru siap dibaca hari ini.',
       timestamp: DateTime(2026, 4, 27, 21, 0),
+      newsId: 'n3',
       isRead: true,
     ),
   ];

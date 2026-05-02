@@ -12,6 +12,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
     date: DateTime(2026, 4, 26),
     readMinutes: 6,
     imageHint: 'AI Office',
+    imageUrl:
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
     featured: true,
     trendingScore: 98,
   ),
@@ -26,6 +28,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
     date: DateTime(2026, 4, 25),
     readMinutes: 5,
     imageHint: 'Green Energy',
+    imageUrl:
+        'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80',
     featured: true,
     trendingScore: 92,
   ),
@@ -40,6 +44,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
     date: DateTime(2026, 4, 24),
     readMinutes: 4,
     imageHint: 'Smart City',
+    imageUrl:
+        'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80',
     trendingScore: 88,
   ),
   NewsItem(
@@ -53,6 +59,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
     date: DateTime(2026, 4, 22),
     readMinutes: 7,
     imageHint: 'Minimalist Living',
+    imageUrl:
+        'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
     trendingScore: 84,
   ),
   NewsItem(
@@ -66,6 +74,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
     date: DateTime(2026, 4, 21),
     readMinutes: 5,
     imageHint: 'Online Learning',
+    imageUrl:
+        'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
     trendingScore: 81,
   ),
   NewsItem(
@@ -79,6 +89,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
     date: DateTime(2026, 4, 20),
     readMinutes: 3,
     imageHint: 'Football Stadium',
+    imageUrl:
+        'https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80',
     trendingScore: 77,
   ),
 ];

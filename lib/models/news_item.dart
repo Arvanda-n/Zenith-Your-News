@@ -8,6 +8,7 @@ class NewsItem {
     required this.date,
     required this.readMinutes,
     required this.imageHint,
+    required this.imageUrl,
     this.featured = false,
     this.trendingScore = 0,
   });
@@ -20,6 +21,7 @@ class NewsItem {
   final DateTime date;
   final int readMinutes;
   final String imageHint;
+  final String imageUrl;
   final bool featured;
   final int trendingScore;
 }
