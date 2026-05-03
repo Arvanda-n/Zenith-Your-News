@@ -14,6 +14,8 @@ enum FontScaleOption {
   final String label;
 }
 
+enum BookmarkActionResult { added, removed, loginRequired }
+
 class AppController extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
   FontScaleOption _fontScale = FontScaleOption.normal;
@@ -70,13 +72,20 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleBookmark(String id) {
+  BookmarkActionResult toggleBookmark(String id) {
+    if (!_isLoggedIn) {
+      return BookmarkActionResult.loginRequired;
+    }
+
     if (_bookmarks.contains(id)) {
       _bookmarks.remove(id);
+      notifyListeners();
+      return BookmarkActionResult.removed;
     } else {
       _bookmarks.add(id);
+      notifyListeners();
+      return BookmarkActionResult.added;
     }
-    notifyListeners();
   }
 
   void removeBookmark(String id) {
@@ -110,6 +119,7 @@ class AppController extends ChangeNotifier {
     _isLoggedIn = false;
     _userName = null;
     _userEmail = null;
+    _bookmarks.clear();
     notifyListeners();
   }
 

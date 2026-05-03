@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
+import '../widgets/news_image.dart';
 
 class BookmarkScreen extends StatelessWidget {
   const BookmarkScreen({
@@ -9,23 +10,55 @@ class BookmarkScreen extends StatelessWidget {
     required this.controller,
     required this.news,
     required this.onOpenDetail,
+    required this.onOpenLogin,
   });
 
   final AppController controller;
   final List<NewsItem> news;
   final ValueChanged<NewsItem> onOpenDetail;
+  final VoidCallback onOpenLogin;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: controller,
       builder: (context, _) {
-        final bookmarked = news
-            .where((n) => controller.isBookmarked(n.id))
-            .toList();
+        final bookmarked = news.where((n) => controller.isBookmarked(n.id)).toList();
+        final isLoggedIn = controller.isLoggedIn;
+
         return Scaffold(
           appBar: AppBar(title: const Text('Bookmarks')),
-          body: bookmarked.isEmpty
+          body: !isLoggedIn
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.lock_outline, size: 56),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Login untuk memakai bookmark',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Bookmark hanya disimpan untuk pengguna yang sudah login.',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: onOpenLogin,
+                          child: const Text('Login sekarang'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : bookmarked.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
@@ -56,7 +89,16 @@ class BookmarkScreen extends StatelessWidget {
                     final item = bookmarked[index];
                     return Card(
                       child: ListTile(
+                        contentPadding: const EdgeInsets.all(12),
+                        minLeadingWidth: 72,
                         onTap: () => onOpenDetail(item),
+                        leading: NewsImage(
+                          imageUrl: item.imageUrl,
+                          imageHint: item.imageHint,
+                          width: 72,
+                          height: 72,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         title: Text(
                           item.title,
                           maxLines: 2,

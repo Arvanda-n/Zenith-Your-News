@@ -114,6 +114,7 @@ class _RootShellState extends State<RootShell> {
         controller: widget.controller,
         news: dummyNews,
         onOpenDetail: _openDetail,
+        onOpenLogin: _openLogin,
       ),
       ProfileScreen(
         controller: widget.controller,

@@ -46,6 +46,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     imageHint: 'Smart City',
     imageUrl:
         'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80',
+    featured: true,
     trendingScore: 88,
   ),
   NewsItem(
@@ -92,5 +93,66 @@ final List<NewsItem> dummyNews = <NewsItem>[
     imageUrl:
         'https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80',
     trendingScore: 77,
+  ),
+  NewsItem(
+    id: 'n7',
+    title: 'Peneliti Lokal Temukan Baterai Cepat Isi untuk Motor Listrik',
+    description:
+        'Prototipe baru diklaim memangkas waktu pengisian hingga setengahnya.',
+    content:
+        'Tim riset kampus dan industri mengembangkan material baterai baru yang meningkatkan efisiensi termal saat pengisian daya. Jika lolos uji produksi massal, teknologi ini berpotensi mempercepat adopsi kendaraan listrik roda dua di Indonesia.',
+    category: 'Innovation',
+    date: DateTime(2026, 4, 19),
+    readMinutes: 6,
+    imageHint: 'Electric Battery',
+    imageUrl:
+        'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?auto=format&fit=crop&w=1200&q=80',
+    featured: true,
+    trendingScore: 90,
+  ),
+  NewsItem(
+    id: 'n8',
+    title: 'Wisata Bahari Timur Indonesia Menarik Lonjakan Pengunjung Premium',
+    description:
+        'Operator tur mencatat kenaikan pemesanan paket pengalaman eksklusif.',
+    content:
+        'Destinasi laut di kawasan timur Indonesia semakin diminati oleh wisatawan domestik dan internasional. Pelaku usaha menyebut kombinasi konservasi, layanan privat, dan promosi digital menjadi pendorong utama tren ini.',
+    category: 'Travel',
+    date: DateTime(2026, 4, 18),
+    readMinutes: 4,
+    imageHint: 'Ocean Travel',
+    imageUrl:
+        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+    trendingScore: 76,
+  ),
+  NewsItem(
+    id: 'n9',
+    title: 'Brand Fashion Lokal Uji Coba Produksi Berbasis Daur Ulang',
+    description:
+        'Koleksi baru memanfaatkan limbah tekstil untuk lini pakaian harian.',
+    content:
+        'Beberapa label fashion lokal mulai membangun rantai pasok sirkular dengan memanfaatkan bahan sisa produksi. Konsumen muda disebut menjadi segmen paling responsif terhadap produk yang menonjolkan transparansi bahan dan jejak lingkungan.',
+    category: 'Business',
+    date: DateTime(2026, 4, 17),
+    readMinutes: 5,
+    imageHint: 'Sustainable Fashion',
+    imageUrl:
+        'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80',
+    trendingScore: 74,
+  ),
+  NewsItem(
+    id: 'n10',
+    title: 'Rumah Sakit Gunakan AI Triage untuk Percepat Layanan Darurat',
+    description:
+        'Sistem membantu prioritisasi pasien berdasarkan gejala awal dan risiko.',
+    content:
+        'Beberapa rumah sakit di kota besar mulai menguji sistem triage berbasis AI untuk mempersingkat waktu tunggu pasien gawat darurat. Tenaga medis tetap menjadi pengambil keputusan utama, tetapi sistem baru membantu menyusun prioritas dengan lebih cepat.',
+    category: 'Health',
+    date: DateTime(2026, 4, 16),
+    readMinutes: 7,
+    imageHint: 'Hospital AI',
+    imageUrl:
+        'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80',
+    trendingScore: 86,
   ),
 ];

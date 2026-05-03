@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
@@ -9,6 +10,24 @@ class DetailScreen extends StatelessWidget {
 
   final AppController controller;
   final NewsItem item;
+
+  void _handleBookmark(BuildContext context) {
+    final result = controller.toggleBookmark(item.id);
+    final message = switch (result) {
+      BookmarkActionResult.added => 'Berita disimpan ke bookmark.',
+      BookmarkActionResult.removed => 'Berita dihapus dari bookmark.',
+      BookmarkActionResult.loginRequired =>
+        'Login dulu untuk menyimpan bookmark.',
+    };
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _handleShare() async {
+    final shareText =
+        '${item.title}\n\n${item.description}\n\nKategori: ${item.category} • ${item.readMinutes} min read\n\nBaca di ZYN.';
+    await SharePlus.instance.share(ShareParams(text: shareText));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,15 +47,11 @@ class DetailScreen extends StatelessWidget {
                 icon: Icon(
                   isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                 ),
-                onPressed: () => controller.toggleBookmark(item.id),
+                onPressed: () => _handleBookmark(context),
               ),
               IconButton(
                 icon: const Icon(Icons.share_outlined),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Share action placeholder')),
-                  );
-                },
+                onPressed: _handleShare,
               ),
             ],
           ),
