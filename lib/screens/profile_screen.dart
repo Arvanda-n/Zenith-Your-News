@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../state/app_controller.dart';
 
@@ -16,20 +16,34 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = controller.themeMode == ThemeMode.dark;
     return AnimatedBuilder(
       animation: controller,
       builder: (context, _) {
+        final isDark = controller.themeMode == ThemeMode.dark;
+        final isLoggedIn = controller.isLoggedIn;
+
         return Scaffold(
           appBar: AppBar(title: const Text('Profile & Settings')),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Card(
+              Card(
                 child: ListTile(
-                  leading: CircleAvatar(child: Icon(Icons.person_outline)),
-                  title: Text('Alex Rivera'),
-                  subtitle: Text('alex.rivera@example.com'),
+                  leading: CircleAvatar(
+                    child: Icon(
+                      isLoggedIn ? Icons.person : Icons.person_outline,
+                    ),
+                  ),
+                  title: Text(
+                    isLoggedIn
+                        ? controller.userName ?? 'ZYN Reader'
+                        : 'Belum login',
+                  ),
+                  subtitle: Text(
+                    isLoggedIn
+                        ? controller.userEmail ?? ''
+                        : 'Silakan login untuk menyimpan preferensi akun',
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -113,8 +127,18 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               FilledButton(
-                onPressed: onOpenLogin,
-                child: const Text('Login (Phase 2)'),
+                onPressed: () {
+                  if (isLoggedIn) {
+                    controller.logout();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Berhasil logout.')),
+                    );
+                    return;
+                  }
+
+                  onOpenLogin();
+                },
+                child: Text(isLoggedIn ? 'Logout' : 'Login'),
               ),
             ],
           ),

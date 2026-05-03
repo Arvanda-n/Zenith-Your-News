@@ -18,6 +18,9 @@ class AppController extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
   FontScaleOption _fontScale = FontScaleOption.normal;
   bool _notificationsEnabled = true;
+  bool _isLoggedIn = false;
+  String? _userName;
+  String? _userEmail;
   final Set<String> _bookmarks = <String>{};
   List<AppNotification> _notifications = <AppNotification>[
     AppNotification(
@@ -48,6 +51,9 @@ class AppController extends ChangeNotifier {
   FontScaleOption get fontScale => _fontScale;
   Set<String> get bookmarks => _bookmarks;
   bool get notificationsEnabled => _notificationsEnabled;
+  bool get isLoggedIn => _isLoggedIn;
+  String? get userName => _userName;
+  String? get userEmail => _userEmail;
   List<AppNotification> get notifications => _notifications;
   int get unreadNotificationCount =>
       _notifications.where((item) => !item.isRead).length;
@@ -83,6 +89,30 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void login({
+    required String email,
+    required String password,
+    String? name,
+  }) {
+    if (email.trim().isEmpty || password.isEmpty) {
+      return;
+    }
+
+    _isLoggedIn = true;
+    _userEmail = email.trim();
+    _userName = (name != null && name.trim().isNotEmpty)
+        ? name.trim()
+        : _deriveNameFromEmail(email);
+    notifyListeners();
+  }
+
+  void logout() {
+    _isLoggedIn = false;
+    _userName = null;
+    _userEmail = null;
+    notifyListeners();
+  }
+
   void markNotificationRead(String id) {
     _notifications = _notifications
         .map((item) => item.id == id ? item.copyWith(isRead: true) : item)
@@ -94,5 +124,20 @@ class AppController extends ChangeNotifier {
     _notifications =
         _notifications.map((item) => item.copyWith(isRead: true)).toList();
     notifyListeners();
+  }
+
+  String _deriveNameFromEmail(String email) {
+    final localPart = email.trim().split('@').first;
+    if (localPart.isEmpty) {
+      return 'ZYN Reader';
+    }
+
+    return localPart
+        .split(RegExp(r'[._-]+'))
+        .where((part) => part.isNotEmpty)
+        .map(
+          (part) => '${part[0].toUpperCase()}${part.substring(1).toLowerCase()}',
+        )
+        .join(' ');
   }
 }

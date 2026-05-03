@@ -74,6 +74,17 @@ class _RootShellState extends State<RootShell> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => LoginScreen(
+          onLogin: ({
+            required String email,
+            required String password,
+            String? name,
+          }) {
+            widget.controller.login(
+              email: email,
+              password: password,
+              name: name,
+            );
+          },
           onForgotPassword: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
