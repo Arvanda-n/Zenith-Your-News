@@ -8,7 +8,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Perusahaan teknologi melaporkan kenaikan produktivitas setelah adopsi AI assistant.',
     content:
         'Adopsi alat berbasis AI dalam workflow harian menunjukkan dampak signifikan pada kecepatan kerja. Tim dapat merangkum rapat, menyusun draf dokumen, dan mengotomatiskan tugas repetitif dengan lebih efisien. Para analis menilai tren ini akan terus tumbuh di 2 tahun ke depan.',
-    category: 'Technology',
+    category: 'Teknologi',
     date: DateTime(2026, 4, 26),
     readMinutes: 6,
     imageHint: 'AI Office',
@@ -24,7 +24,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Nilai investasi proyek energi bersih meningkat tajam pada kuartal pertama 2026.',
     content:
         'Investasi pada energi surya, angin, dan kendaraan listrik meningkat berkat kebijakan fiskal baru. Pemerintah dan swasta berkolaborasi membangun infrastruktur yang lebih ramah lingkungan. Dampaknya diprediksi menciptakan lapangan kerja baru secara luas.',
-    category: 'Economy',
+    category: 'Ekonomi',
     date: DateTime(2026, 4, 25),
     readMinutes: 5,
     imageHint: 'Green Energy',
@@ -40,7 +40,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Sistem baru memanfaatkan data real-time untuk menekan kemacetan jam sibuk.',
     content:
         'Penggunaan sensor, kamera, dan machine learning membantu pengelola kota mengatur lampu lalu lintas secara dinamis. Hasil awal menunjukkan pengurangan waktu tempuh rata-rata hingga 18 persen pada koridor utama.',
-    category: 'Urban',
+    category: 'Perkotaan',
     date: DateTime(2026, 4, 24),
     readMinutes: 4,
     imageHint: 'Smart City',
@@ -56,7 +56,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Tren hidup sederhana dianggap membantu kesehatan mental dan fokus kerja.',
     content:
         'Komunitas digital minimalism bertumbuh di berbagai kota besar. Banyak pengguna mengurangi distraksi digital dan memprioritaskan rutinitas yang lebih sehat. Psikolog menilai pendekatan ini relevan untuk era informasi cepat.',
-    category: 'Lifestyle',
+    category: 'Gaya Hidup',
     date: DateTime(2026, 4, 22),
     readMinutes: 7,
     imageHint: 'Minimalist Living',
@@ -71,7 +71,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Platform menyesuaikan materi sesuai kemampuan dan ritme belajar pengguna.',
     content:
         'Dengan machine learning, platform baru dapat memetakan kelemahan konsep pengguna dan memberi latihan personal. Uji coba awal pada siswa SMA menunjukkan peningkatan pemahaman materi matematika dasar.',
-    category: 'Education',
+    category: 'Pendidikan',
     date: DateTime(2026, 4, 21),
     readMinutes: 5,
     imageHint: 'Online Learning',
@@ -86,7 +86,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Antusiasme suporter naik berkat format kompetisi baru dan ticketing digital.',
     content:
         'Perbaikan fasilitas stadion, pengalaman digital, dan jadwal pertandingan yang lebih konsisten mendorong kenaikan jumlah penonton. Pihak liga menargetkan ekspansi pasar regional musim depan.',
-    category: 'Sports',
+    category: 'Olahraga',
     date: DateTime(2026, 4, 20),
     readMinutes: 3,
     imageHint: 'Football Stadium',
@@ -101,7 +101,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Prototipe baru diklaim memangkas waktu pengisian hingga setengahnya.',
     content:
         'Tim riset kampus dan industri mengembangkan material baterai baru yang meningkatkan efisiensi termal saat pengisian daya. Jika lolos uji produksi massal, teknologi ini berpotensi mempercepat adopsi kendaraan listrik roda dua di Indonesia.',
-    category: 'Innovation',
+    category: 'Inovasi',
     date: DateTime(2026, 4, 19),
     readMinutes: 6,
     imageHint: 'Electric Battery',
@@ -117,7 +117,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Operator tur mencatat kenaikan pemesanan paket pengalaman eksklusif.',
     content:
         'Destinasi laut di kawasan timur Indonesia semakin diminati oleh wisatawan domestik dan internasional. Pelaku usaha menyebut kombinasi konservasi, layanan privat, dan promosi digital menjadi pendorong utama tren ini.',
-    category: 'Travel',
+    category: 'Wisata',
     date: DateTime(2026, 4, 18),
     readMinutes: 4,
     imageHint: 'Ocean Travel',
@@ -132,7 +132,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Koleksi baru memanfaatkan limbah tekstil untuk lini pakaian harian.',
     content:
         'Beberapa label fashion lokal mulai membangun rantai pasok sirkular dengan memanfaatkan bahan sisa produksi. Konsumen muda disebut menjadi segmen paling responsif terhadap produk yang menonjolkan transparansi bahan dan jejak lingkungan.',
-    category: 'Business',
+    category: 'Bisnis',
     date: DateTime(2026, 4, 17),
     readMinutes: 5,
     imageHint: 'Sustainable Fashion',
@@ -147,7 +147,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
         'Sistem membantu prioritisasi pasien berdasarkan gejala awal dan risiko.',
     content:
         'Beberapa rumah sakit di kota besar mulai menguji sistem triage berbasis AI untuk mempersingkat waktu tunggu pasien gawat darurat. Tenaga medis tetap menjadi pengambil keputusan utama, tetapi sistem baru membantu menyusun prioritas dengan lebih cepat.',
-    category: 'Health',
+    category: 'Kesehatan',
     date: DateTime(2026, 4, 16),
     readMinutes: 7,
     imageHint: 'Hospital AI',

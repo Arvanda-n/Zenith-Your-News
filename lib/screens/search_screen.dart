@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
+import '../utils/news_category.dart';
 import '../widgets/news_image.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final trendingTopics = widget.news
-        .map((item) => item.category)
+        .map((item) => item.categoryLabel)
         .toSet()
         .take(6)
         .toList();
@@ -38,7 +39,7 @@ class _SearchScreenState extends State<SearchScreen> {
       final q = _query.toLowerCase();
       return n.title.toLowerCase().contains(q) ||
           n.description.toLowerCase().contains(q) ||
-          n.category.toLowerCase().contains(q);
+          n.categoryLabel.toLowerCase().contains(q);
     }).toList();
     final recommendations = List<NewsItem>.from(widget.news)
       ..sort((a, b) => b.trendingScore.compareTo(a.trendingScore));
@@ -131,7 +132,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    item.category,
+                                    item.categoryLabel,
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.w700,
@@ -192,7 +193,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
-                          '${item.category} • ${item.readMinutes} menit baca',
+                          '${item.categoryLabel} • ${item.readMinutes} menit baca',
                         ),
                       ),
                       trailing: const Icon(Icons.chevron_right_rounded),

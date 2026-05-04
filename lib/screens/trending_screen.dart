@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
+import '../utils/news_category.dart';
 import '../widgets/news_image.dart';
 
 class TrendingScreen extends StatelessWidget {
@@ -93,8 +94,8 @@ class TrendingScreen extends StatelessWidget {
                   ),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        '${item.category} • skor ${item.trendingScore}',
+                    child: Text(
+                      '${item.categoryLabel} • skor ${item.trendingScore}',
                     ),
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded),
@@ -172,7 +173,7 @@ class _PodiumCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.category,
+                    item.categoryLabel,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.w700,

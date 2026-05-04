@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
+import '../utils/news_category.dart';
 import '../widgets/news_image.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -30,11 +31,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     final categories = <String>{
       'Semua',
-      ...widget.news.map((item) => item.category),
+      ...widget.news.map((item) => item.categoryLabel),
     }.toList();
     final filtered = _selectedCategory == 'Semua'
         ? widget.news
-        : widget.news.where((item) => item.category == _selectedCategory).toList();
+        : widget.news
+            .where((item) => item.categoryLabel == _selectedCategory)
+            .toList();
 
     return Scaffold(
       body: SafeArea(
@@ -98,7 +101,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.category,
+                                  item.categoryLabel,
                                   style: TextStyle(
                                     color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w700,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
+import '../utils/news_category.dart';
 import '../widgets/news_image.dart';
 
 class ForYouScreen extends StatelessWidget {
@@ -99,7 +100,7 @@ class ForYouScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                item.category,
+                                item.categoryLabel,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.w700,
@@ -154,7 +155,9 @@ class ForYouScreen extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  subtitle: Text('${item.category} • ${item.readMinutes} menit baca'),
+                  subtitle: Text(
+                    '${item.categoryLabel} • ${item.readMinutes} menit baca',
+                  ),
                 ),
               ),
             ),

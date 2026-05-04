@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
+import '../utils/news_category.dart';
 import '../widgets/news_image.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -42,6 +43,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final featured = widget.news.where((item) => item.featured).toList();
+    final featuredItems = featured.isEmpty
+        ? (List<NewsItem>.from(widget.news)
+          ..sort((a, b) => b.trendingScore.compareTo(a.trendingScore)))
+            .take(3)
+            .toList()
+        : featured;
     final curated = widget.news
         .where((item) => item.trendingScore >= 84)
         .take(4)
@@ -49,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final latest = List<NewsItem>.from(widget.news)
       ..sort((a, b) => b.date.compareTo(a.date));
     final categories = <String>{
-      ...widget.news.map((item) => item.category),
+      ...widget.news.map((item) => item.categoryLabel),
     }.take(6).toList();
 
     return AnimatedBuilder(
@@ -151,49 +158,54 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverToBoxAdapter(
               child: SizedBox(
                 height: 340,
-                child: PageView.builder(
-                  controller: _headlineController,
-                  onPageChanged: (value) => setState(() => _headlineIndex = value),
-                  itemCount: featured.length,
-                  itemBuilder: (context, index) {
-                    final item = featured[index];
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      child: _HeadlineCard(
-                        item: item,
-                        onTap: () => widget.onOpenDetail(item),
+                child: featuredItems.isEmpty
+                    ? const SizedBox.shrink()
+                    : PageView.builder(
+                        controller: _headlineController,
+                        onPageChanged: (value) =>
+                            setState(() => _headlineIndex = value),
+                        itemCount: featuredItems.length,
+                        itemBuilder: (context, index) {
+                          final item = featuredItems[index];
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                            child: _HeadlineCard(
+                              item: item,
+                              showSwipeHint: featuredItems.length > 1,
+                              onTap: () => widget.onOpenDetail(item),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(featured.length, (index) {
-                    final active = index == _headlineIndex;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: active ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        gradient: active ? AppTheme.brandGradient : null,
-                        color: active
-                            ? null
-                            : Theme.of(context).colorScheme.primary.withValues(
-                                alpha: 0.16,
-                              ),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    );
-                  }),
+            if (featuredItems.length > 1)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(featuredItems.length, (index) {
+                      final active = index == _headlineIndex;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: active ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          gradient: active ? AppTheme.brandGradient : null,
+                          color: active
+                              ? null
+                              : Theme.of(context).colorScheme.primary.withValues(
+                                  alpha: 0.16,
+                                ),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      );
+                    }),
+                  ),
                 ),
               ),
-            ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
@@ -315,9 +327,14 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _HeadlineCard extends StatelessWidget {
-  const _HeadlineCard({required this.item, required this.onTap});
+  const _HeadlineCard({
+    required this.item,
+    required this.showSwipeHint,
+    required this.onTap,
+  });
 
   final NewsItem item;
+  final bool showSwipeHint;
   final VoidCallback onTap;
 
   @override
@@ -363,37 +380,43 @@ class _HeadlineCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          item.category,
+                          item.categoryLabel,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.swipe_rounded, color: Colors.white, size: 16),
-                            SizedBox(width: 6),
-                            Text(
-                              'Geser',
-                              style: TextStyle(
+                      if (showSwipeHint) ...[
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.swipe_rounded,
                                 color: Colors.white,
-                                fontWeight: FontWeight.w600,
+                                size: 16,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 6),
+                              Text(
+                                'Geser',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                   const Spacer(),
@@ -571,7 +594,7 @@ class _CuratedCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.category,
+                      item.categoryLabel,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w700,
@@ -633,7 +656,7 @@ class _LatestTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.category,
+                      item.categoryLabel,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w700,
