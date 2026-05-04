@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../models/app_notification.dart';
 
@@ -21,9 +21,11 @@ class AppController extends ChangeNotifier {
   FontScaleOption _fontScale = FontScaleOption.normal;
   bool _notificationsEnabled = true;
   bool _isLoggedIn = false;
+  bool _hasCompletedOnboarding = false;
   String? _userName;
   String? _userEmail;
   final Set<String> _bookmarks = <String>{};
+  final Set<String> _preferredCategories = <String>{};
   List<AppNotification> _notifications = <AppNotification>[
     AppNotification(
       id: 'ntf-1',
@@ -37,14 +39,14 @@ class AppController extends ChangeNotifier {
       title: 'Pembaruan Tren',
       message: 'Ekonomi Hijau Dorong Investasi Baru di Asia Tenggara',
       timestamp: DateTime(2026, 4, 28, 7, 10),
-      newsId: 'n2',
+      newsId: 'n6',
     ),
     AppNotification(
       id: 'ntf-3',
-      title: 'Daily Digest',
+      title: 'Ringkasan Harian',
       message: '5 berita baru siap dibaca hari ini.',
       timestamp: DateTime(2026, 4, 27, 21, 0),
-      newsId: 'n3',
+      newsId: 'n11',
       isRead: true,
     ),
   ];
@@ -54,9 +56,11 @@ class AppController extends ChangeNotifier {
   Set<String> get bookmarks => _bookmarks;
   bool get notificationsEnabled => _notificationsEnabled;
   bool get isLoggedIn => _isLoggedIn;
+  bool get hasCompletedOnboarding => _hasCompletedOnboarding;
   String? get userName => _userName;
   String? get userEmail => _userEmail;
   List<AppNotification> get notifications => _notifications;
+  Set<String> get preferredCategories => _preferredCategories;
   int get unreadNotificationCount =>
       _notifications.where((item) => !item.isRead).length;
 
@@ -72,6 +76,29 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void completeOnboarding(Iterable<String> selectedCategories) {
+    _preferredCategories
+      ..clear()
+      ..addAll(
+        selectedCategories
+            .map((item) => item.trim())
+            .where((item) => item.isNotEmpty),
+      );
+    _hasCompletedOnboarding = true;
+    notifyListeners();
+  }
+
+  void updatePreferredCategories(Iterable<String> selectedCategories) {
+    _preferredCategories
+      ..clear()
+      ..addAll(
+        selectedCategories
+            .map((item) => item.trim())
+            .where((item) => item.isNotEmpty),
+      );
+    notifyListeners();
+  }
+
   BookmarkActionResult toggleBookmark(String id) {
     if (!_isLoggedIn) {
       return BookmarkActionResult.loginRequired;
@@ -81,11 +108,11 @@ class AppController extends ChangeNotifier {
       _bookmarks.remove(id);
       notifyListeners();
       return BookmarkActionResult.removed;
-    } else {
-      _bookmarks.add(id);
-      notifyListeners();
-      return BookmarkActionResult.added;
     }
+
+    _bookmarks.add(id);
+    notifyListeners();
+    return BookmarkActionResult.added;
   }
 
   void removeBookmark(String id) {

@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'data/dummy_news.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/root_shell.dart';
 import 'screens/splash_screen.dart';
 import 'state/app_controller.dart';
 import 'theme/app_theme.dart';
+import 'utils/news_category.dart';
 
 class ZynApp extends StatefulWidget {
   const ZynApp({super.key});
@@ -39,6 +42,10 @@ class _ZynAppState extends State<ZynApp> {
 
   @override
   Widget build(BuildContext context) {
+    final availableCategories = <String>{
+      ...dummyNews.map((item) => item.categoryLabel),
+    }.toList();
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
@@ -63,10 +70,16 @@ class _ZynAppState extends State<ZynApp> {
             switchOutCurve: Curves.easeInCubic,
             child: _showSplash
                 ? const SplashScreen()
-                : RootShell(
-                    key: const ValueKey('root_shell'),
-                    controller: _controller,
-                  ),
+                : _controller.hasCompletedOnboarding
+                    ? RootShell(
+                        key: const ValueKey('root_shell'),
+                        controller: _controller,
+                      )
+                    : OnboardingScreen(
+                        key: const ValueKey('onboarding_screen'),
+                        availableCategories: availableCategories,
+                        onComplete: _controller.completeOnboarding,
+                      ),
           ),
         );
       },

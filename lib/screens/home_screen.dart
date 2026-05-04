@@ -31,7 +31,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _headlineController = PageController(viewportFraction: 0.92);
+  final PageController _headlineController = PageController();
   int _headlineIndex = 0;
 
   @override
@@ -42,31 +42,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final featured = widget.news.where((item) => item.featured).take(5).toList();
-    final featuredItems = featured.isEmpty
-        ? (List<NewsItem>.from(widget.news)
-          ..sort((a, b) => b.trendingScore.compareTo(a.trendingScore)))
-            .take(5)
-            .toList()
-        : featured;
-    final curatedItems = widget.news
-        .where((item) => item.trendingScore >= 84)
-        .take(6)
-        .toList();
-    final latest = List<NewsItem>.from(widget.news)
-      ..sort((a, b) => b.date.compareTo(a.date));
-    final categoryCounts = <String, int>{};
+    final preferredCategories = widget.controller.preferredCategories;
+    final featuredItems = _prioritizeByPreference(
+      widget.news.where((item) => item.featured),
+      preferredCategories,
+    ).take(5).toList();
+    final curatedItems = _prioritizeByPreference(
+      widget.news.where((item) => item.trendingScore >= 84),
+      preferredCategories,
+    ).take(6).toList();
+    final latest = _sortLatest(widget.news, preferredCategories);
+
+    final highlightedCategories = <String, int>{};
     for (final item in widget.news) {
-      categoryCounts.update(
+      highlightedCategories.update(
         item.categoryLabel,
         (value) => value + 1,
         ifAbsent: () => 1,
       );
     }
-    final highlightedCategories = categoryCounts.entries.take(6).toList();
-    final safeHeadlineIndex = featuredItems.isEmpty
-        ? 0
-        : _headlineIndex.clamp(0, featuredItems.length - 1);
+    final categoryEntries = highlightedCategories.entries.take(6).toList();
+
+    final greeting = widget.controller.isLoggedIn
+        ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
+        : 'Selamat datang di ZYN';
+    final preferenceSummary = preferredCategories.isEmpty
+        ? 'Buka berita penting hari ini dengan sorotan visual yang lebih rapi dan mudah dijelajahi.'
+        : 'Fokus hari ini: ${preferredCategories.join(', ')}';
 
     return AnimatedBuilder(
       animation: widget.controller,
@@ -78,185 +80,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: SafeArea(
                   bottom: false,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'ZYN',
-                                  style: Theme.of(context).textTheme.headlineMedium
-                                      ?.copyWith(fontWeight: FontWeight.w800),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.controller.isLoggedIn
-                                      ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
-                                      : 'Ringkasan berita pilihan untuk hari ini',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                          _TopActionButton(
-                            icon: Icons.search_rounded,
-                            onTap: widget.onOpenSearch,
-                          ),
-                          const SizedBox(width: 6),
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              _TopActionButton(
-                                icon: Icons.notifications_none_rounded,
-                                onTap: widget.onOpenNotifications,
-                              ),
-                              if (widget.controller.notificationsEnabled &&
-                                  widget.controller.unreadNotificationCount > 0)
-                                Positioned(
-                                  right: -2,
-                                  top: -2,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      gradient: AppTheme.brandGradient,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      widget.controller.unreadNotificationCount > 9
-                                          ? '9+'
-                                          : '${widget.controller.unreadNotificationCount}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              const Color(0xFFDBEAFE),
-                              Colors.white,
-                              const Color(0xFFEDE9FE),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: AppTheme.brandGradient,
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: const Text(
-                                    'Sorotan Hari Ini',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  '${widget.news.length} berita siap dibaca',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Berita yang relevan, visual yang lebih kaya, dan kategori yang lebih lengkap untuk ritme baca harianmu.',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                height: 1.45,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  child: _TopHeroSection(
+                    greeting: greeting,
+                    preferenceSummary: preferenceSummary,
+                    featuredItems: featuredItems,
+                    headlineController: _headlineController,
+                    headlineIndex: _headlineIndex,
+                    unreadNotificationCount:
+                        widget.controller.notificationsEnabled
+                            ? widget.controller.unreadNotificationCount
+                            : 0,
+                    onOpenSearch: widget.onOpenSearch,
+                    onOpenNotifications: widget.onOpenNotifications,
+                    onPageChanged: (value) =>
+                        setState(() => _headlineIndex = value),
+                    onOpenDetail: widget.onOpenDetail,
                   ),
                 ),
               ),
             ),
-            if (featuredItems.isNotEmpty)
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 360,
-                  child: PageView.builder(
-                    controller: _headlineController,
-                    onPageChanged: (value) => setState(() => _headlineIndex = value),
-                    itemCount: featuredItems.length,
-                    itemBuilder: (context, index) {
-                      final item = featuredItems[index];
-                      return Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          index == 0 ? 16 : 8,
-                          18,
-                          index == featuredItems.length - 1 ? 16 : 8,
-                          0,
-                        ),
-                        child: _HeadlineCard(
-                          item: item,
-                          showSwipeHint: featuredItems.length > 1,
-                          onTap: () => widget.onOpenDetail(item),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            if (featuredItems.length > 1)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(featuredItems.length, (index) {
-                      final active = index == safeHeadlineIndex;
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 220),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: active ? 24 : 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          gradient: active ? AppTheme.brandGradient : null,
-                          color: active
-                              ? null
-                              : Theme.of(context).colorScheme.primary.withValues(
-                                  alpha: 0.16,
-                                ),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-              ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
@@ -291,7 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _SectionHeader(
                       title: 'Untuk Anda',
-                      subtitle: 'Pilihan paling relevan berdasarkan momentum hari ini.',
+                      subtitle: preferredCategories.isEmpty
+                          ? 'Pilihan paling relevan berdasarkan momentum hari ini.'
+                          : 'Kurasi diprioritaskan dari minat yang kamu pilih saat onboarding.',
                       actionLabel: 'Buka',
                       onAction: widget.onOpenForYou,
                     ),
@@ -324,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _SectionHeader(
                       title: 'Jelajahi Topik',
-                      subtitle: 'Setiap kategori kini lebih lengkap dan siap dijelajahi.',
+                      subtitle: 'Semua kategori sudah dirapikan agar pengalaman membaca terasa lebih lengkap.',
                       actionLabel: 'Lihat semua',
                       onAction: widget.onOpenCategories,
                     ),
@@ -332,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                      children: highlightedCategories
+                      children: categoryEntries
                           .map(
                             (entry) => ActionChip(
                               label: Text('${entry.key} • ${entry.value}'),
@@ -375,10 +219,229 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
+  List<NewsItem> _prioritizeByPreference(
+    Iterable<NewsItem> source,
+    Set<String> preferredCategories,
+  ) {
+    final items = List<NewsItem>.from(source);
+    items.sort((a, b) {
+      final aPreferred = preferredCategories.contains(a.categoryLabel);
+      final bPreferred = preferredCategories.contains(b.categoryLabel);
+      if (aPreferred != bPreferred) {
+        return aPreferred ? -1 : 1;
+      }
+      return b.trendingScore.compareTo(a.trendingScore);
+    });
+    return items;
+  }
+
+  List<NewsItem> _sortLatest(
+    List<NewsItem> source,
+    Set<String> preferredCategories,
+  ) {
+    final items = List<NewsItem>.from(source);
+    items.sort((a, b) {
+      final byDate = b.date.compareTo(a.date);
+      if (byDate != 0) {
+        return byDate;
+      }
+      final aPreferred = preferredCategories.contains(a.categoryLabel);
+      final bPreferred = preferredCategories.contains(b.categoryLabel);
+      if (aPreferred != bPreferred) {
+        return aPreferred ? -1 : 1;
+      }
+      return b.trendingScore.compareTo(a.trendingScore);
+    });
+    return items;
+  }
 }
 
-class _TopActionButton extends StatelessWidget {
-  const _TopActionButton({required this.icon, required this.onTap});
+class _TopHeroSection extends StatelessWidget {
+  const _TopHeroSection({
+    required this.greeting,
+    required this.preferenceSummary,
+    required this.featuredItems,
+    required this.headlineController,
+    required this.headlineIndex,
+    required this.unreadNotificationCount,
+    required this.onOpenSearch,
+    required this.onOpenNotifications,
+    required this.onPageChanged,
+    required this.onOpenDetail,
+  });
+
+  final String greeting;
+  final String preferenceSummary;
+  final List<NewsItem> featuredItems;
+  final PageController headlineController;
+  final int headlineIndex;
+  final int unreadNotificationCount;
+  final VoidCallback onOpenSearch;
+  final VoidCallback onOpenNotifications;
+  final ValueChanged<int> onPageChanged;
+  final ValueChanged<NewsItem> onOpenDetail;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1D4ED8),
+            Color(0xFF4F46E5),
+            Color(0xFF7C3AED),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(32),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'ZYN',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        greeting,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _HeroActionButton(
+                  icon: Icons.search_rounded,
+                  onTap: onOpenSearch,
+                ),
+                const SizedBox(width: 8),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    _HeroActionButton(
+                      icon: Icons.notifications_none_rounded,
+                      onTap: onOpenNotifications,
+                    ),
+                    if (unreadNotificationCount > 0)
+                      Positioned(
+                        right: -4,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            unreadNotificationCount > 9
+                                ? '9+'
+                                : '$unreadNotificationCount',
+                            style: const TextStyle(
+                              color: Color(0xFF312E81),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              preferenceSummary,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 18),
+            if (featuredItems.isNotEmpty) ...[
+              SizedBox(
+                height: 320,
+                child: PageView.builder(
+                  controller: headlineController,
+                  onPageChanged: onPageChanged,
+                  itemCount: featuredItems.length,
+                  itemBuilder: (context, index) {
+                    final item = featuredItems[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: _HeadlineCard(
+                        item: item,
+                        showSwipeHint: featuredItems.length > 1,
+                        onTap: () => onOpenDetail(item),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              if (featuredItems.length > 1) ...[
+                const SizedBox(height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(featuredItems.length, (index) {
+                    final active = index == headlineIndex;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: active ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: active
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.28),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ] else
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Text(
+                  'Belum ada headline yang siap ditampilkan. Coba buka kategori untuk mulai menjelajah berita.',
+                  style: TextStyle(color: Colors.white, height: 1.5),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroActionButton extends StatelessWidget {
+  const _HeroActionButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -386,13 +449,16 @@ class _TopActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 46,
-      height: 46,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+        color: Colors.white.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: IconButton(onPressed: onTap, icon: Icon(icon)),
+      child: IconButton(
+        onPressed: onTap,
+        icon: Icon(icon, color: Colors.white),
+      ),
     );
   }
 }
@@ -435,31 +501,35 @@ class _HeadlineCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.16),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          item.categoryLabel,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.16),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            item.categoryLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
                       if (showSwipeHint) ...[
-                        const Spacer(),
+                        const SizedBox(width: 10),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -470,6 +540,7 @@ class _HeadlineCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: const Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.swipe_rounded,
@@ -505,7 +576,7 @@ class _HeadlineCard extends StatelessWidget {
                     item.description,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, height: 1.5),
+                    style: const TextStyle(color: Colors.white70, height: 1.45),
                   ),
                   const SizedBox(height: 16),
                   Wrap(
