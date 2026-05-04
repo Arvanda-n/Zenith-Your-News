@@ -58,142 +58,118 @@ class _HomeScreenState extends State<HomeScreen> {
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: Container(
-                decoration: const BoxDecoration(gradient: AppTheme.brandGradient),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 24),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: SafeArea(
                   bottom: false,
-                  child: Column(
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(999),
-                              onTap: widget.onOpenSearch,
-                              child: Ink(
-                                height: 58,
-                                padding: const EdgeInsets.symmetric(horizontal: 18),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.search_rounded,
-                                      color: Theme.of(context).colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        'Telusuri berita, topik, atau kategori...',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withValues(alpha: 0.88),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'ZYN',
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(fontWeight: FontWeight.w800),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              InkWell(
-                                borderRadius: BorderRadius.circular(20),
-                                onTap: widget.onOpenNotifications,
-                                child: Ink(
-                                  width: 58,
-                                  height: 58,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.14),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Icon(
-                                    Icons.notifications_none_rounded,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              if (widget.controller.notificationsEnabled &&
-                                  widget.controller.unreadNotificationCount > 0)
-                                Positioned(
-                                  right: -4,
-                                  top: -4,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 7,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      widget.controller.unreadNotificationCount > 9
-                                          ? '9+'
-                                          : '${widget.controller.unreadNotificationCount}',
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.primary,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      SizedBox(
-                        height: 360,
-                        child: PageView.builder(
-                          controller: _headlineController,
-                          onPageChanged: (value) {
-                            setState(() => _headlineIndex = value);
-                          },
-                          itemCount: featured.length,
-                          itemBuilder: (context, index) {
-                            final item = featured[index];
-                            return _HeadlineCard(
-                              item: item,
-                              onTap: () => widget.onOpenDetail(item),
-                            );
-                          },
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.controller.isLoggedIn
+                                  ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
+                                  : 'Ringkasan berita pilihan untuk hari ini',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 14),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(featured.length, (index) {
-                          final active = index == _headlineIndex;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 220),
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: active ? 24 : 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: active
-                                  ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.42),
-                              borderRadius: BorderRadius.circular(999),
+                      IconButton(
+                        onPressed: widget.onOpenSearch,
+                        icon: const Icon(Icons.search_rounded),
+                      ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            onPressed: widget.onOpenNotifications,
+                            icon: const Icon(Icons.notifications_none_rounded),
+                          ),
+                          if (widget.controller.notificationsEnabled &&
+                              widget.controller.unreadNotificationCount > 0)
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: AppTheme.brandGradient,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  widget.controller.unreadNotificationCount > 9
+                                      ? '9+'
+                                      : '${widget.controller.unreadNotificationCount}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
                             ),
-                          );
-                        }),
+                        ],
                       ),
                     ],
                   ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 360,
+                child: PageView.builder(
+                  controller: _headlineController,
+                  onPageChanged: (value) => setState(() => _headlineIndex = value),
+                  itemCount: featured.length,
+                  itemBuilder: (context, index) {
+                    final item = featured[index];
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: _HeadlineCard(
+                        item: item,
+                        onTap: () => widget.onOpenDetail(item),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(featured.length, (index) {
+                    final active = index == _headlineIndex;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: active ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        gradient: active ? AppTheme.brandGradient : null,
+                        color: active
+                            ? null
+                            : Theme.of(context).colorScheme.primary.withValues(
+                                alpha: 0.16,
+                              ),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    );
+                  }),
                 ),
               ),
             ),

@@ -36,6 +36,7 @@ class _RootShellState extends State<RootShell> {
           controller: widget.controller,
           item: item,
           allNews: dummyNews,
+          onRequireLogin: _openLogin,
         ),
       ),
     );

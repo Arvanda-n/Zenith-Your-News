@@ -11,11 +11,13 @@ class DetailScreen extends StatefulWidget {
     required this.controller,
     required this.item,
     required this.allNews,
+    required this.onRequireLogin,
   });
 
   final AppController controller;
   final NewsItem item;
   final List<NewsItem> allNews;
+  final VoidCallback onRequireLogin;
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -57,11 +59,13 @@ class _DetailScreenState extends State<DetailScreen> {
     final message = switch (result) {
       BookmarkActionResult.added => 'Berita disimpan.',
       BookmarkActionResult.removed => 'Berita dihapus dari simpanan.',
-      BookmarkActionResult.loginRequired =>
-        'Masuk dulu untuk menyimpan berita.',
+      BookmarkActionResult.loginRequired => 'Silakan masuk terlebih dahulu.',
     };
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    if (result == BookmarkActionResult.loginRequired) {
+      widget.onRequireLogin();
+    }
   }
 
   Future<void> _handleShare() async {
@@ -225,6 +229,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                           controller: widget.controller,
                                           item: item,
                                           allNews: widget.allNews,
+                                          onRequireLogin: widget.onRequireLogin,
                                         ),
                                       ),
                                     );
