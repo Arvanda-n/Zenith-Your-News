@@ -105,9 +105,7 @@ class BookmarkScreen extends StatelessWidget {
                                           ),
                                         ),
                                         const SizedBox(height: 8),
-                                        Text(
-                                          '${item.readMinutes} min read',
-                                        ),
+                                        Text('${item.readMinutes} menit baca'),
                                       ],
                                     ),
                                   ),

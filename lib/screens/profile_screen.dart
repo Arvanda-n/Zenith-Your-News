@@ -96,7 +96,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               _ProfileGroup(
-                title: 'Reading Experience',
+                title: 'Pengalaman Membaca',
                 children: [
                   ListTile(
                     title: const Text('Pusat Notifikasi'),

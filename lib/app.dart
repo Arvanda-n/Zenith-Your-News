@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'screens/root_shell.dart';
+import 'screens/splash_screen.dart';
 import 'state/app_controller.dart';
 import 'theme/app_theme.dart';
 
@@ -13,9 +16,23 @@ class ZynApp extends StatefulWidget {
 
 class _ZynAppState extends State<ZynApp> {
   final AppController _controller = AppController();
+  bool _showSplash = true;
+  Timer? _splashTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _splashTimer = Timer(const Duration(milliseconds: 1900), () {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _showSplash = false);
+    });
+  }
 
   @override
   void dispose() {
+    _splashTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -40,7 +57,17 @@ class _ZynAppState extends State<ZynApp> {
               child: child!,
             );
           },
-          home: RootShell(controller: _controller),
+          home: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 420),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            child: _showSplash
+                ? const SplashScreen()
+                : RootShell(
+                    key: const ValueKey('root_shell'),
+                    controller: _controller,
+                  ),
+          ),
         );
       },
     );

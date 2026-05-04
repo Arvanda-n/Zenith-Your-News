@@ -83,22 +83,43 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        onPressed: widget.onOpenSearch,
-                        icon: const Icon(Icons.search_rounded),
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withValues(
+                            alpha: 0.08,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: IconButton(
+                          onPressed: widget.onOpenSearch,
+                          icon: const Icon(Icons.search_rounded),
+                        ),
                       ),
+                      const SizedBox(width: 6),
                       Stack(
                         clipBehavior: Clip.none,
                         children: [
-                          IconButton(
-                            onPressed: widget.onOpenNotifications,
-                            icon: const Icon(Icons.notifications_none_rounded),
+                          Container(
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary.withValues(
+                                alpha: 0.08,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: IconButton(
+                              onPressed: widget.onOpenNotifications,
+                              icon: const Icon(Icons.notifications_none_rounded),
+                            ),
                           ),
                           if (widget.controller.notificationsEnabled &&
                               widget.controller.unreadNotificationCount > 0)
                             Positioned(
-                              right: 8,
-                              top: 8,
+                              right: -2,
+                              top: -2,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
@@ -129,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SliverToBoxAdapter(
               child: SizedBox(
-                height: 360,
+                height: 340,
                 child: PageView.builder(
                   controller: _headlineController,
                   onPageChanged: (value) => setState(() => _headlineIndex = value),
