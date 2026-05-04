@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../data/dummy_news.dart';
 import '../models/news_item.dart';
+import '../widgets/news_image.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key, required this.onOpenDetail});
+  const SearchScreen({
+    super.key,
+    required this.news,
+    required this.onOpenDetail,
+  });
 
+  final List<NewsItem> news;
   final ValueChanged<NewsItem> onOpenDetail;
 
   @override
@@ -16,17 +21,6 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   String _query = '';
 
-  final List<String> recent = const [
-    'Artificial Intelligence',
-    'Green Energy',
-    'Minimalist Living',
-  ];
-  final List<String> trending = const [
-    '#Tech (1.2k)',
-    '#Economy (800)',
-    '#Sports (630)',
-  ];
-
   @override
   void dispose() {
     _controller.dispose();
@@ -35,77 +29,169 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final result = dummyNews.where((n) {
+    final trendingTopics = widget.news
+        .map((item) => item.category)
+        .toSet()
+        .take(6)
+        .toList();
+    final result = widget.news.where((n) {
       final q = _query.toLowerCase();
       return n.title.toLowerCase().contains(q) ||
           n.description.toLowerCase().contains(q) ||
           n.category.toLowerCase().contains(q);
     }).toList();
+    final recommendations = List<NewsItem>.from(widget.news)
+      ..sort((a, b) => b.trendingScore.compareTo(a.trendingScore));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Search News')),
+      appBar: AppBar(title: const Text('Search & Discover')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           TextField(
             controller: _controller,
             onChanged: (value) => setState(() => _query = value),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Cari berita, topik, kategori...',
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _query.isEmpty
+                  ? null
+                  : IconButton(
+                      onPressed: () {
+                        _controller.clear();
+                        setState(() => _query = '');
+                      },
+                      icon: const Icon(Icons.close_rounded),
+                    ),
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Recent Searches',
-            style: TextStyle(fontWeight: FontWeight.w700),
+          Text(
+            _query.isEmpty ? 'Popular right now' : 'Results',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            children: recent
-                .map(
-                  (e) => ActionChip(
-                    label: Text(e),
-                    onPressed: () => setState(() {
-                      _query = e;
-                      _controller.text = e;
-                    }),
-                  ),
-                )
-                .toList(),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Trending Topics',
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            children: trending.map((e) => Chip(label: Text(e))).toList(),
-          ),
-          const SizedBox(height: 16),
-          const Text('Results', style: TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          ...result.map(
-            (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Card(
-                child: ListTile(
-                  onTap: () => widget.onOpenDetail(item),
-                  title: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    '${item.category} • ${item.readMinutes} min read',
+          if (_query.isEmpty) ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: trendingTopics
+                  .map(
+                    (topic) => ActionChip(
+                      label: Text(topic),
+                      onPressed: () {
+                        _controller.text = topic;
+                        setState(() => _query = topic);
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Recommended for discovery',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...recommendations.take(5).map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Card(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: () => widget.onOpenDetail(item),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          NewsImage(
+                            imageUrl: item.imageUrl,
+                            imageHint: item.imageHint,
+                            width: 92,
+                            height: 92,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.category,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  item.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  item.description,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ] else if (result.isEmpty) ...[
+            const SizedBox(height: 24),
+            const Center(
+              child: Text('Belum ada hasil yang cocok. Coba kata kunci lain.'),
+            ),
+          ] else ...[
+            const SizedBox(height: 8),
+            ...result.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Card(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(12),
+                    minLeadingWidth: 86,
+                    leading: NewsImage(
+                      imageUrl: item.imageUrl,
+                      imageHint: item.imageHint,
+                      width: 86,
+                      height: 86,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    title: Text(
+                      item.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        '${item.category} • ${item.readMinutes} min read',
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => widget.onOpenDetail(item),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

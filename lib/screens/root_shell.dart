@@ -5,7 +5,9 @@ import '../models/app_notification.dart';
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
 import 'bookmark_screen.dart';
+import 'category_screen.dart';
 import 'detail_screen.dart';
+import 'for_you_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -30,7 +32,11 @@ class _RootShellState extends State<RootShell> {
   void _openDetail(NewsItem item) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => DetailScreen(controller: widget.controller, item: item),
+        builder: (_) => DetailScreen(
+          controller: widget.controller,
+          item: item,
+          allNews: dummyNews,
+        ),
       ),
     );
   }
@@ -38,7 +44,30 @@ class _RootShellState extends State<RootShell> {
   void _openSearch() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => SearchScreen(onOpenDetail: _openDetail),
+        builder: (_) => SearchScreen(news: dummyNews, onOpenDetail: _openDetail),
+      ),
+    );
+  }
+
+  void _openForYou() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ForYouScreen(
+          news: dummyNews,
+          userName: widget.controller.userName,
+          onOpenDetail: _openDetail,
+        ),
+      ),
+    );
+  }
+
+  void _openCategories() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CategoryScreen(
+          news: dummyNews,
+          onOpenDetail: _openDetail,
+        ),
       ),
     );
   }
@@ -104,6 +133,8 @@ class _RootShellState extends State<RootShell> {
         onOpenDetail: _openDetail,
         onOpenSearch: _openSearch,
         onOpenNotifications: _openNotifications,
+        onOpenForYou: _openForYou,
+        onOpenCategories: _openCategories,
       ),
       TrendingScreen(
         controller: widget.controller,
@@ -128,24 +159,29 @@ class _RootShellState extends State<RootShell> {
       builder: (context, _) {
         return Scaffold(
           body: IndexedStack(index: _tabIndex, children: pages),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _tabIndex,
-            onTap: (value) => setState(() => _tabIndex = value),
-            items: const [
-              BottomNavigationBarItem(
+          bottomNavigationBar: NavigationBar(
+            height: 78,
+            selectedIndex: _tabIndex,
+            onDestinationSelected: (value) => setState(() => _tabIndex = value),
+            destinations: const [
+              NavigationDestination(
                 icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home_rounded),
                 label: 'Home',
               ),
-              BottomNavigationBarItem(
+              NavigationDestination(
                 icon: Icon(Icons.local_fire_department_outlined),
+                selectedIcon: Icon(Icons.local_fire_department),
                 label: 'Trending',
               ),
-              BottomNavigationBarItem(
+              NavigationDestination(
                 icon: Icon(Icons.bookmark_border),
+                selectedIcon: Icon(Icons.bookmark),
                 label: 'Bookmark',
               ),
-              BottomNavigationBarItem(
+              NavigationDestination(
                 icon: Icon(Icons.person_outline),
+                selectedIcon: Icon(Icons.person),
                 label: 'Profile',
               ),
             ],

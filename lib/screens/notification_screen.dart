@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../models/app_notification.dart';
 import '../models/news_item.dart';
+import '../theme/app_theme.dart';
 import '../state/app_controller.dart';
 import '../widgets/news_image.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({
     super.key,
     required this.controller,
@@ -17,6 +18,13 @@ class NotificationScreen extends StatelessWidget {
   final List<NewsItem> news;
   final void Function(AppNotification notification, NewsItem? relatedNews)
   onOpenNotification;
+
+  @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  bool _unreadOnly = false;
 
   String _timeLabel(DateTime value) {
     final now = DateTime.now();
@@ -35,7 +43,7 @@ class NotificationScreen extends StatelessWidget {
       return null;
     }
 
-    for (final item in news) {
+    for (final item in widget.news) {
       if (item.id == newsId) {
         return item;
       }
@@ -46,37 +54,106 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: widget.controller,
       builder: (context, _) {
-        final notifications = controller.notifications;
+        final allNotifications = widget.controller.notifications;
+        final notifications = _unreadOnly
+            ? allNotifications.where((item) => !item.isRead).toList()
+            : allNotifications;
+
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Notifications'),
+            title: const Text('Notification Center'),
             actions: [
               TextButton(
-                onPressed: controller.unreadNotificationCount == 0
+                onPressed: widget.controller.unreadNotificationCount == 0
                     ? null
-                    : controller.markAllNotificationsRead,
+                    : widget.controller.markAllNotificationsRead,
                 child: const Text('Mark all read'),
               ),
             ],
           ),
-          body: notifications.isEmpty
-              ? const Center(child: Text('Belum ada notifikasi.'))
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemBuilder: (context, index) {
-                    final AppNotification item = notifications[index];
-                    final NewsItem? relatedNews = _findRelatedNews(item.newsId);
-
-                    return Card(
+          body: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.brandGradient,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: const Icon(
+                        Icons.notifications_active_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${widget.controller.unreadNotificationCount} unread updates',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Pantau breaking news, digest harian, dan update kategori favoritmu.',
+                            style: TextStyle(color: Colors.white70, height: 1.45),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('All'),
+                    selected: !_unreadOnly,
+                    onSelected: (_) => setState(() => _unreadOnly = false),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Unread'),
+                    selected: _unreadOnly,
+                    onSelected: (_) => setState(() => _unreadOnly = true),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (notifications.isEmpty)
+                const Center(child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Text('Belum ada notifikasi untuk filter ini.'),
+                ))
+              else
+                ...notifications.map((item) {
+                  final relatedNews = _findRelatedNews(item.newsId);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Card(
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(12),
                         minLeadingWidth: 64,
                         titleAlignment: ListTileTitleAlignment.top,
                         onTap: () {
-                          controller.markNotificationRead(item.id);
-                          onOpenNotification(item, relatedNews);
+                          widget.controller.markNotificationRead(item.id);
+                          widget.onOpenNotification(item, relatedNews);
                         },
                         leading: relatedNews != null
                             ? NewsImage(
@@ -84,7 +161,7 @@ class NotificationScreen extends StatelessWidget {
                                 imageHint: relatedNews.imageHint,
                                 width: 64,
                                 height: 64,
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(14),
                               )
                             : CircleAvatar(
                                 backgroundColor: item.isRead
@@ -95,39 +172,44 @@ class NotificationScreen extends StatelessWidget {
                                     : Theme.of(context)
                                           .colorScheme
                                           .primary
-                                          .withValues(alpha: 0.2),
+                                          .withValues(alpha: 0.18),
                                 child: Icon(
                                   item.isRead
                                       ? Icons.notifications_none
                                       : Icons.notifications_active,
                                 ),
                               ),
-                        trailing: const Icon(Icons.chevron_right),
-                        title: Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Text(
-                            item.title,
-                            style: TextStyle(
-                              fontWeight: item.isRead
-                                  ? FontWeight.w500
-                                  : FontWeight.w700,
-                            ),
+                        trailing: !item.isRead
+                            ? Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  gradient: AppTheme.brandGradient,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                              )
+                            : const Icon(Icons.chevron_right_rounded),
+                        title: Text(
+                          item.title,
+                          style: TextStyle(
+                            fontWeight: item.isRead
+                                ? FontWeight.w600
+                                : FontWeight.w800,
                           ),
                         ),
                         subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.only(top: 6),
                           child: Text(
                             '${item.message}\n${_timeLabel(item.timestamp)}',
                           ),
                         ),
                         isThreeLine: true,
                       ),
-                    );
-                  },
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 10),
-                  itemCount: notifications.length,
-                ),
+                    ),
+                  );
+                }),
+            ],
+          ),
         );
       },
     );

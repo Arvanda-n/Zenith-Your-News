@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
 import '../state/app_controller.dart';
+import '../theme/app_theme.dart';
 import '../widgets/news_image.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +13,8 @@ class HomeScreen extends StatefulWidget {
     required this.onOpenDetail,
     required this.onOpenSearch,
     required this.onOpenNotifications,
+    required this.onOpenForYou,
+    required this.onOpenCategories,
   });
 
   final AppController controller;
@@ -19,160 +22,260 @@ class HomeScreen extends StatefulWidget {
   final ValueChanged<NewsItem> onOpenDetail;
   final VoidCallback onOpenSearch;
   final VoidCallback onOpenNotifications;
+  final VoidCallback onOpenForYou;
+  final VoidCallback onOpenCategories;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _featuredController = PageController(viewportFraction: 0.92);
-  int _featuredIndex = 0;
+  final PageController _headlineController = PageController();
+  int _headlineIndex = 0;
 
   @override
   void dispose() {
-    _featuredController.dispose();
+    _headlineController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final featured = widget.news.where((item) => item.featured).toList();
+    final curated = widget.news
+        .where((item) => item.trendingScore >= 84)
+        .take(4)
+        .toList();
     final latest = List<NewsItem>.from(widget.news)
       ..sort((a, b) => b.date.compareTo(a.date));
+    final categories = <String>{
+      ...widget.news.map((item) => item.category),
+    }.take(6).toList();
 
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (context, _) {
         return CustomScrollView(
           slivers: [
-            SliverAppBar(
-              pinned: true,
-              title: const Text(
-                'ZYN',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              actions: [
-                IconButton(
-                  onPressed: widget.onOpenSearch,
-                  icon: const Icon(Icons.search),
-                ),
-                Stack(
-                  clipBehavior: Clip.none,
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Row(
                   children: [
-                    IconButton(
-                      onPressed: widget.onOpenNotifications,
-                      icon: const Icon(Icons.notifications_none),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ZYN',
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(fontWeight: FontWeight.w800),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.controller.isLoggedIn
+                                ? 'Good to see you, ${widget.controller.userName ?? 'Reader'}'
+                                : 'Your premium daily news brief',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
                     ),
-                    if (widget.controller.notificationsEnabled &&
-                        widget.controller.unreadNotificationCount > 0)
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            widget.controller.unreadNotificationCount > 9
-                                ? '9+'
-                                : '${widget.controller.unreadNotificationCount}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
+                    IconButton(
+                      onPressed: widget.onOpenSearch,
+                      icon: const Icon(Icons.search_rounded),
+                    ),
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        IconButton(
+                          onPressed: widget.onOpenNotifications,
+                          icon: const Icon(Icons.notifications_none_rounded),
+                        ),
+                        if (widget.controller.notificationsEnabled &&
+                            widget.controller.unreadNotificationCount > 0)
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: AppTheme.brandGradient,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                widget.controller.unreadNotificationCount > 9
+                                    ? '9+'
+                                    : '${widget.controller.unreadNotificationCount}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 360,
+                child: PageView.builder(
+                  controller: _headlineController,
+                  onPageChanged: (value) => setState(() => _headlineIndex = value),
+                  itemCount: featured.length,
+                  itemBuilder: (context, index) {
+                    final item = featured[index];
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: _HeadlineCard(
+                        item: item,
+                        onTap: () => widget.onOpenDetail(item),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(featured.length, (index) {
+                    final active = index == _headlineIndex;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: active ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        gradient: active ? AppTheme.brandGradient : null,
+                        color: active
+                            ? null
+                            : Theme.of(context).colorScheme.primary.withValues(
+                                alpha: 0.16,
+                              ),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _QuickActionCard(
+                        title: 'For You',
+                        subtitle: 'Kurasi personal',
+                        icon: Icons.auto_awesome_rounded,
+                        onTap: widget.onOpenForYou,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _QuickActionCard(
+                        title: 'Categories',
+                        subtitle: 'Jelajahi topik',
+                        icon: Icons.grid_view_rounded,
+                        onTap: widget.onOpenCategories,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Top Headlines',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Geser kartu untuk melihat headline utama lainnya.',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    _SectionHeader(
+                      title: 'For You',
+                      subtitle: 'Pilihan paling relevan berdasarkan momentum hari ini.',
+                      actionLabel: 'Open',
+                      onAction: widget.onOpenForYou,
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 230,
-                      child: PageView.builder(
-                        controller: _featuredController,
-                        itemCount: featured.length,
-                        onPageChanged: (value) {
-                          setState(() => _featuredIndex = value);
-                        },
+                      height: 240,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: curated.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
                         itemBuilder: (context, index) {
-                          final item = featured[index];
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              right: index == featured.length - 1 ? 0 : 12,
-                            ),
-                            child: _FeaturedCard(
-                              item: item,
-                              isActive: index == _featuredIndex,
-                              onTap: () => widget.onOpenDetail(item),
-                            ),
+                          final item = curated[index];
+                          return _CuratedCard(
+                            item: item,
+                            onTap: () => widget.onOpenDetail(item),
                           );
                         },
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(featured.length, (index) {
-                        final isActive = index == _featuredIndex;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: isActive ? 24 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.outlineVariant,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        );
-                      }),
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionHeader(
+                      title: 'Browse Topics',
+                      subtitle: 'Pindah cepat ke kategori yang kamu suka.',
+                      actionLabel: 'View all',
+                      onAction: widget.onOpenCategories,
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Latest News',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: categories
+                          .map(
+                            (category) => ActionChip(
+                              label: Text(category),
+                              onPressed: widget.onOpenCategories,
+                            ),
+                          )
+                          .toList(),
                     ),
                   ],
                 ),
               ),
             ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: _SectionHeader(
+                  title: 'Latest Stories',
+                  subtitle: 'Rangkuman berita terbaru yang tetap nyaman dibaca.',
+                ),
+              ),
+            ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               sliver: SliverList.builder(
                 itemCount: latest.length,
                 itemBuilder: (context, index) {
                   final item = latest[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _NewsTile(
+                    child: _LatestTile(
                       item: item,
                       onTap: () => widget.onOpenDetail(item),
                     ),
@@ -187,53 +290,277 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _FeaturedCard extends StatelessWidget {
-  const _FeaturedCard({
-    required this.item,
-    required this.isActive,
-    required this.onTap,
-  });
+class _HeadlineCard extends StatelessWidget {
+  const _HeadlineCard({required this.item, required this.onTap});
 
   final NewsItem item;
-  final bool isActive;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedScale(
-      duration: const Duration(milliseconds: 220),
-      scale: isActive ? 1 : 0.97,
+    return Card(
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-          child: Stack(
-            fit: StackFit.expand,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            NewsImage(
+              imageUrl: item.imageUrl,
+              imageHint: item.imageHint,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.04),
+                    Colors.black.withValues(alpha: 0.78),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          item.category,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.swipe_rounded, color: Colors.white, size: 16),
+                            SizedBox(width: 6),
+                            Text(
+                              'Swipe',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    item.title,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    item.description,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white70, height: 1.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      FilledButton(
+                        onPressed: onTap,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Theme.of(context).colorScheme.primary,
+                          minimumSize: const Size(0, 48),
+                        ),
+                        child: const Text('Read now'),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        '${item.readMinutes} min read',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickActionCard extends StatelessWidget {
+  const _QuickActionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  gradient: AppTheme.brandGradient,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(icon, color: Colors.white),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(subtitle),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.title,
+    required this.subtitle,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final String title;
+  final String subtitle;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(subtitle),
+            ],
+          ),
+        ),
+        if (actionLabel != null && onAction != null)
+          TextButton(onPressed: onAction, child: Text(actionLabel!)),
+      ],
+    );
+  }
+}
+
+class _CuratedCard extends StatelessWidget {
+  const _CuratedCard({required this.item, required this.onTap});
+
+  final NewsItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 260,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NewsImage(
                 imageUrl: item.imageUrl,
                 imageHint: item.imageHint,
-                borderRadius: BorderRadius.circular(16),
+                height: 132,
+                borderRadius: BorderRadius.zero,
               ),
               Padding(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Chip(
-                      label: Text(item.category),
-                      visualDensity: VisualDensity.compact,
+                    Text(
+                      item.category,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 8),
                     Text(
                       item.title,
-                      maxLines: 3,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -241,7 +568,6 @@ class _FeaturedCard extends StatelessWidget {
                       item.description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white70, height: 1.4),
                     ),
                   ],
                 ),
@@ -254,38 +580,42 @@ class _FeaturedCard extends StatelessWidget {
   }
 }
 
-class _NewsTile extends StatelessWidget {
-  const _NewsTile({required this.item, required this.onTap});
+class _LatestTile extends StatelessWidget {
+  const _LatestTile({required this.item, required this.onTap});
 
   final NewsItem item;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final secondaryColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFA4A4A4)
-        : const Color(0xFF6B7280);
-
     return Card(
       child: InkWell(
+        borderRadius: BorderRadius.circular(24),
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               NewsImage(
                 imageUrl: item.imageUrl,
                 imageHint: item.imageHint,
-                width: 86,
-                height: 86,
-                borderRadius: BorderRadius.circular(12),
+                width: 104,
+                height: 104,
+                borderRadius: BorderRadius.circular(18),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      item.category,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
                     Text(
                       item.title,
                       maxLines: 2,
@@ -295,17 +625,14 @@ class _NewsTile extends StatelessWidget {
                         fontSize: 18,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Text(
                       item.description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${item.category} • ${item.readMinutes} min read',
-                      style: TextStyle(color: secondaryColor, fontSize: 12),
-                    ),
+                    const SizedBox(height: 10),
+                    Text('${item.readMinutes} min read'),
                   ],
                 ),
               ),
