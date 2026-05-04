@@ -155,40 +155,161 @@ class _RootShellState extends State<RootShell> {
       ),
     ];
 
+    const items = <_NavItemData>[
+      _NavItemData(
+        label: 'Beranda',
+        icon: Icons.home_outlined,
+        selectedIcon: Icons.home_rounded,
+      ),
+      _NavItemData(
+        label: 'Tren',
+        icon: Icons.local_fire_department_outlined,
+        selectedIcon: Icons.local_fire_department,
+      ),
+      _NavItemData(
+        label: 'Simpan',
+        icon: Icons.bookmark_border,
+        selectedIcon: Icons.bookmark,
+      ),
+      _NavItemData(
+        label: 'Profil',
+        icon: Icons.person_outline,
+        selectedIcon: Icons.person,
+      ),
+    ];
+
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (context, _) {
         return Scaffold(
+          extendBody: true,
           body: IndexedStack(index: _tabIndex, children: pages),
-          bottomNavigationBar: NavigationBar(
-            height: 78,
-            selectedIndex: _tabIndex,
-            onDestinationSelected: (value) => setState(() => _tabIndex = value),
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home_rounded),
-                label: 'Beranda',
+          bottomNavigationBar: SafeArea(
+            top: false,
+            minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF1D4ED8),
+                    Color(0xFF4F46E5),
+                    Color(0xFF7C3AED),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF312E81).withValues(alpha: 0.26),
+                    blurRadius: 28,
+                    offset: const Offset(0, 16),
+                  ),
+                ],
               ),
-              NavigationDestination(
-                icon: Icon(Icons.local_fire_department_outlined),
-                selectedIcon: Icon(Icons.local_fire_department),
-                label: 'Tren',
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Row(
+                  children: List.generate(items.length, (index) {
+                    final item = items[index];
+                    final selected = index == _tabIndex;
+                    return Expanded(
+                      child: _BottomNavItem(
+                        label: item.label,
+                        icon: item.icon,
+                        selectedIcon: item.selectedIcon,
+                        selected: selected,
+                        onTap: () => setState(() => _tabIndex = index),
+                      ),
+                    );
+                  }),
+                ),
               ),
-              NavigationDestination(
-                icon: Icon(Icons.bookmark_border),
-                selectedIcon: Icon(Icons.bookmark),
-                label: 'Simpan',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_outline),
-                selectedIcon: Icon(Icons.person),
-                label: 'Profil',
-              ),
-            ],
+            ),
           ),
         );
       },
     );
   }
+}
+
+class _BottomNavItem extends StatelessWidget {
+  const _BottomNavItem({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = selected ? const Color(0xFF1E1B4B) : Colors.white;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? Colors.white.withValues(alpha: 0.92)
+                  : Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: selected
+                    ? Colors.white.withValues(alpha: 0.6)
+                    : Colors.white.withValues(alpha: 0.14),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  selected ? selectedIcon : icon,
+                  color: foreground,
+                  size: 24,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: foreground,
+                    fontSize: 12,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItemData {
+  const _NavItemData({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+  });
+
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
 }

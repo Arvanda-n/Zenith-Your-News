@@ -31,7 +31,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _headlineController = PageController();
+  final PageController _headlineController = PageController(viewportFraction: 0.92);
   int _headlineIndex = 0;
 
   @override
@@ -42,22 +42,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final featured = widget.news.where((item) => item.featured).toList();
+    final featured = widget.news.where((item) => item.featured).take(5).toList();
     final featuredItems = featured.isEmpty
         ? (List<NewsItem>.from(widget.news)
           ..sort((a, b) => b.trendingScore.compareTo(a.trendingScore)))
-            .take(3)
+            .take(5)
             .toList()
         : featured;
-    final curated = widget.news
+    final curatedItems = widget.news
         .where((item) => item.trendingScore >= 84)
-        .take(4)
+        .take(6)
         .toList();
     final latest = List<NewsItem>.from(widget.news)
       ..sort((a, b) => b.date.compareTo(a.date));
-    final categories = <String>{
-      ...widget.news.map((item) => item.categoryLabel),
-    }.take(6).toList();
+    final categoryCounts = <String, int>{};
+    for (final item in widget.news) {
+      categoryCounts.update(
+        item.categoryLabel,
+        (value) => value + 1,
+        ifAbsent: () => 1,
+      );
+    }
+    final highlightedCategories = categoryCounts.entries.take(6).toList();
+    final safeHeadlineIndex = featuredItems.isEmpty
+        ? 0
+        : _headlineIndex.clamp(0, featuredItems.length - 1);
 
     return AnimatedBuilder(
       animation: widget.controller,
@@ -69,116 +78,158 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: SafeArea(
                   bottom: false,
-                  child: Row(
+                  child: Column(
                     children: [
-                      Expanded(
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'ZYN',
+                                  style: Theme.of(context).textTheme.headlineMedium
+                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.controller.isLoggedIn
+                                      ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
+                                      : 'Ringkasan berita pilihan untuk hari ini',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                          _TopActionButton(
+                            icon: Icons.search_rounded,
+                            onTap: widget.onOpenSearch,
+                          ),
+                          const SizedBox(width: 6),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              _TopActionButton(
+                                icon: Icons.notifications_none_rounded,
+                                onTap: widget.onOpenNotifications,
+                              ),
+                              if (widget.controller.notificationsEnabled &&
+                                  widget.controller.unreadNotificationCount > 0)
+                                Positioned(
+                                  right: -2,
+                                  top: -2,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: AppTheme.brandGradient,
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      widget.controller.unreadNotificationCount > 9
+                                          ? '9+'
+                                          : '${widget.controller.unreadNotificationCount}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              const Color(0xFFDBEAFE),
+                              Colors.white,
+                              const Color(0xFFEDE9FE),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(28),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'ZYN',
-                              style: Theme.of(context).textTheme.headlineMedium
-                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: AppTheme.brandGradient,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: const Text(
+                                    'Sorotan Hari Ini',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '${widget.news.length} berita siap dibaca',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 12),
                             Text(
-                              widget.controller.isLoggedIn
-                                  ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
-                                  : 'Ringkasan berita pilihan untuk hari ini',
-                              style: Theme.of(context).textTheme.bodyMedium,
+                              'Berita yang relevan, visual yang lebih kaya, dan kategori yang lebih lengkap untuk ritme baca harianmu.',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                height: 1.45,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withValues(
-                            alpha: 0.08,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: IconButton(
-                          onPressed: widget.onOpenSearch,
-                          icon: const Icon(Icons.search_rounded),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 46,
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withValues(
-                                alpha: 0.08,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: IconButton(
-                              onPressed: widget.onOpenNotifications,
-                              icon: const Icon(Icons.notifications_none_rounded),
-                            ),
-                          ),
-                          if (widget.controller.notificationsEnabled &&
-                              widget.controller.unreadNotificationCount > 0)
-                            Positioned(
-                              right: -2,
-                              top: -2,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: AppTheme.brandGradient,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  widget.controller.unreadNotificationCount > 9
-                                      ? '9+'
-                                      : '${widget.controller.unreadNotificationCount}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 340,
-                child: featuredItems.isEmpty
-                    ? const SizedBox.shrink()
-                    : PageView.builder(
-                        controller: _headlineController,
-                        onPageChanged: (value) =>
-                            setState(() => _headlineIndex = value),
-                        itemCount: featuredItems.length,
-                        itemBuilder: (context, index) {
-                          final item = featuredItems[index];
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                            child: _HeadlineCard(
-                              item: item,
-                              showSwipeHint: featuredItems.length > 1,
-                              onTap: () => widget.onOpenDetail(item),
-                            ),
-                          );
-                        },
-                      ),
+            if (featuredItems.isNotEmpty)
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 360,
+                  child: PageView.builder(
+                    controller: _headlineController,
+                    onPageChanged: (value) => setState(() => _headlineIndex = value),
+                    itemCount: featuredItems.length,
+                    itemBuilder: (context, index) {
+                      final item = featuredItems[index];
+                      return Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          index == 0 ? 16 : 8,
+                          18,
+                          index == featuredItems.length - 1 ? 16 : 8,
+                          0,
+                        ),
+                        child: _HeadlineCard(
+                          item: item,
+                          showSwipeHint: featuredItems.length > 1,
+                          onTap: () => widget.onOpenDetail(item),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
             if (featuredItems.length > 1)
               SliverToBoxAdapter(
                 child: Padding(
@@ -186,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(featuredItems.length, (index) {
-                      final active = index == _headlineIndex;
+                      final active = index == safeHeadlineIndex;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 220),
                         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -246,14 +297,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 240,
+                      height: 252,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
-                        itemCount: curated.length,
+                        itemCount: curatedItems.length,
                         separatorBuilder: (context, index) =>
                             const SizedBox(width: 12),
                         itemBuilder: (context, index) {
-                          final item = curated[index];
+                          final item = curatedItems[index];
                           return _CuratedCard(
                             item: item,
                             onTap: () => widget.onOpenDetail(item),
@@ -273,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _SectionHeader(
                       title: 'Jelajahi Topik',
-                      subtitle: 'Pindah cepat ke kategori yang kamu suka.',
+                      subtitle: 'Setiap kategori kini lebih lengkap dan siap dijelajahi.',
                       actionLabel: 'Lihat semua',
                       onAction: widget.onOpenCategories,
                     ),
@@ -281,10 +332,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                      children: categories
+                      children: highlightedCategories
                           .map(
-                            (category) => ActionChip(
-                              label: Text(category),
+                            (entry) => ActionChip(
+                              label: Text('${entry.key} • ${entry.value}'),
                               onPressed: widget.onOpenCategories,
                             ),
                           )
@@ -304,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 110),
               sliver: SliverList.builder(
                 itemCount: latest.length,
                 itemBuilder: (context, index) {
@@ -322,6 +373,26 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+class _TopActionButton extends StatelessWidget {
+  const _TopActionButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 46,
+      height: 46,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: IconButton(onPressed: onTap, icon: Icon(icon)),
     );
   }
 }
@@ -357,8 +428,8 @@ class _HeadlineCard extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.05),
-                    Colors.black.withValues(alpha: 0.78),
+                    Colors.black.withValues(alpha: 0.06),
+                    Colors.black.withValues(alpha: 0.82),
                   ],
                 ),
               ),
@@ -437,7 +508,10 @@ class _HeadlineCard extends StatelessWidget {
                     style: const TextStyle(color: Colors.white70, height: 1.5),
                   ),
                   const SizedBox(height: 16),
-                  Row(
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       FilledButton(
                         onPressed: onTap,
@@ -448,7 +522,6 @@ class _HeadlineCard extends StatelessWidget {
                         ),
                         child: const Text('Baca sekarang'),
                       ),
-                      const SizedBox(width: 12),
                       Text(
                         '${item.readMinutes} menit baca',
                         style: const TextStyle(
@@ -574,7 +647,7 @@ class _CuratedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 260,
+      width: 264,
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -585,7 +658,7 @@ class _CuratedCard extends StatelessWidget {
               NewsImage(
                 imageUrl: item.imageUrl,
                 imageHint: item.imageHint,
-                height: 132,
+                height: 136,
                 borderRadius: BorderRadius.zero,
               ),
               Padding(
@@ -642,6 +715,7 @@ class _LatestTile extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NewsImage(
                 imageUrl: item.imageUrl,
