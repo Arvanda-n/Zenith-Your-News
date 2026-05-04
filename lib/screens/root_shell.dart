@@ -191,26 +191,23 @@ class _RootShellState extends State<RootShell> {
             minimum: const EdgeInsets.fromLTRB(20, 0, 20, 18),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF2563EB),
-                    Color(0xFF4F46E5),
-                    Color(0xFF7C3AED),
-                  ],
-                ),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(999),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF312E81).withValues(alpha: 0.22),
+                    color: const Color(0xFF4F46E5).withValues(alpha: 0.12),
                     blurRadius: 36,
                     offset: const Offset(0, 18),
+                  ),
+                  BoxShadow(
+                    color: const Color(0xFF1D4ED8).withValues(alpha: 0.08),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 child: Row(
                   children: List.generate(items.length, (index) {
                     final item = items[index];
@@ -252,66 +249,60 @@ class _BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = selected ? const Color(0xFF1E1B4B) : Colors.white;
+    final inactiveColor = const Color(0xFF8C7AAE);
+    final activeForeground = const Color(0xFF3F2D7A);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(999),
           onTap: onTap,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 240),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            height: 56,
+            padding: EdgeInsets.symmetric(
+              horizontal: selected ? 16 : 0,
+              vertical: 6,
+            ),
             decoration: BoxDecoration(
-              color: selected
-                  ? Colors.white.withValues(alpha: 0.96)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(999),
-              boxShadow: selected
-                  ? [
-                      BoxShadow(
-                        color: const Color(0xFFDBEAFE).withValues(alpha: 0.7),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
-                      ),
-                    ]
+              gradient: selected
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFE0E7FF),
+                        Color(0xFFEDE9FE),
+                      ],
+                    )
                   : null,
+              borderRadius: BorderRadius.circular(999),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? const Color(0xFFE0E7FF)
-                        : Colors.white.withValues(alpha: 0.08),
-                    shape: BoxShape.circle,
+            child: selected
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(selectedIcon, color: activeForeground, size: 22),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: activeForeground,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Center(
+                    child: Icon(icon, color: inactiveColor, size: 24),
                   ),
-                  child: Icon(
-                    selected ? selectedIcon : icon,
-                    color: foreground,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foreground,
-                    fontSize: 12,
-                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zyn_flutter_app/app.dart';
 
@@ -19,6 +20,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Beranda'), findsOneWidget);
-    expect(find.text('Tren'), findsOneWidget);
+    expect(find.byIcon(Icons.local_fire_department_outlined), findsOneWidget);
   });
 }
