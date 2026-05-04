@@ -57,7 +57,7 @@ class ProfileScreen extends StatelessWidget {
                           Text(
                             isLoggedIn
                                 ? controller.userName ?? 'Pembaca ZYN'
-                                : 'Belum login',
+                                : 'Belum masuk',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -66,9 +66,12 @@ class ProfileScreen extends StatelessWidget {
                           const SizedBox(height: 6),
                           Text(
                             isLoggedIn
-                                ? controller.userEmail ?? ''
-                                : 'Masuk untuk personalisasi, simpanan, dan sinkronisasi preferensi.',
-                            style: const TextStyle(color: Colors.white70, height: 1.45),
+                                ? '@${controller.userHandle ?? 'pembacazyn'}\n${controller.userEmail ?? ''}'
+                                : 'Masuk / Daftar untuk personalisasi, simpanan, dan sinkronisasi preferensi.',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              height: 1.45,
+                            ),
                           ),
                         ],
                       ),
@@ -78,19 +81,19 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               _ProfileGroup(
-                title: 'Preferences',
+                title: 'Preferensi',
                 children: [
                   SwitchListTile(
                     value: isDark,
                     onChanged: controller.toggleTheme,
-                    title: const Text('Dark Mode'),
+                    title: const Text('Mode gelap'),
                     subtitle: const Text('Tampilan yang lebih fokus untuk malam hari'),
                   ),
                   SwitchListTile(
                     value: controller.notificationsEnabled,
                     onChanged: controller.toggleNotifications,
-                    title: const Text('Notifications'),
-                    subtitle: const Text('Aktifkan update breaking news dan digest'),
+                    title: const Text('Notifikasi'),
+                    subtitle: const Text('Aktifkan update breaking news dan ringkasan harian'),
                   ),
                 ],
               ),
@@ -114,7 +117,7 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Font Size',
+                          'Ukuran font',
                           style: TextStyle(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 10),
@@ -136,10 +139,10 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               _ProfileGroup(
-                title: 'About',
+                title: 'Tentang',
                 children: [
                   ListTile(
-                    title: const Text('About ZYN'),
+                    title: const Text('Tentang ZYN'),
                     subtitle: const Text('Zenith Your News'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () {
@@ -149,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
                         applicationVersion: 'MVP 1.0',
                         children: const [
                           Text(
-                            'News aggregator modern dengan fokus kenyamanan baca, personalisasi, dan visual premium.',
+                            'Aplikasi berita modern dengan fokus kenyamanan baca, personalisasi, dan visual premium.',
                           ),
                         ],
                       );
@@ -163,13 +166,13 @@ class ProfileScreen extends StatelessWidget {
                   if (isLoggedIn) {
                     controller.logout();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Berhasil logout.')),
+                      const SnackBar(content: Text('Berhasil keluar.')),
                     );
                     return;
                   }
                   onOpenLogin();
                 },
-                child: Text(isLoggedIn ? 'Keluar' : 'Masuk'),
+                child: Text(isLoggedIn ? 'Keluar' : 'Masuk / Daftar'),
               ),
             ],
           ),

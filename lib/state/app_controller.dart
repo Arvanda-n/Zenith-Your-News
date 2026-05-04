@@ -23,6 +23,7 @@ class AppController extends ChangeNotifier {
   bool _isLoggedIn = false;
   bool _hasCompletedOnboarding = false;
   String? _userName;
+  String? _userHandle;
   String? _userEmail;
   final Set<String> _bookmarks = <String>{};
   final Set<String> _preferredCategories = <String>{};
@@ -58,6 +59,7 @@ class AppController extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
   String? get userName => _userName;
+  String? get userHandle => _userHandle;
   String? get userEmail => _userEmail;
   List<AppNotification> get notifications => _notifications;
   Set<String> get preferredCategories => _preferredCategories;
@@ -129,6 +131,7 @@ class AppController extends ChangeNotifier {
     required String email,
     required String password,
     String? name,
+    String? username,
   }) {
     if (email.trim().isEmpty || password.isEmpty) {
       return;
@@ -139,12 +142,16 @@ class AppController extends ChangeNotifier {
     _userName = (name != null && name.trim().isNotEmpty)
         ? name.trim()
         : _deriveNameFromEmail(email);
+    _userHandle = _normalizeUsername(
+      username?.trim().isNotEmpty == true ? username!.trim() : email,
+    );
     notifyListeners();
   }
 
   void logout() {
     _isLoggedIn = false;
     _userName = null;
+    _userHandle = null;
     _userEmail = null;
     _bookmarks.clear();
     notifyListeners();
@@ -176,5 +183,13 @@ class AppController extends ChangeNotifier {
           (part) => '${part[0].toUpperCase()}${part.substring(1).toLowerCase()}',
         )
         .join(' ');
+  }
+
+  String _normalizeUsername(String raw) {
+    final base = raw
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9._-]'), '')
+        .replaceAll(RegExp(r'^[._-]+|[._-]+$'), '');
+    return base.isEmpty ? 'pembacazyn' : base;
   }
 }

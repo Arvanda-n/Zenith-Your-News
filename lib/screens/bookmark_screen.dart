@@ -155,7 +155,7 @@ class _BookmarkLockState extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Masuk untuk menyimpan berita',
+                  'Masuk / Daftar untuk menyimpan berita',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                   textAlign: TextAlign.center,
                 ),
@@ -167,7 +167,7 @@ class _BookmarkLockState extends StatelessWidget {
                 const SizedBox(height: 18),
                 FilledButton(
                   onPressed: onOpenLogin,
-                  child: const Text('Masuk sekarang'),
+                  child: const Text('Masuk / Daftar sekarang'),
                 ),
               ],
             ),

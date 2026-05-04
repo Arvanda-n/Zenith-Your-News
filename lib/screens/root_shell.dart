@@ -108,11 +108,13 @@ class _RootShellState extends State<RootShell> {
             required String email,
             required String password,
             String? name,
+            String? username,
           }) {
             widget.controller.login(
               email: email,
               password: password,
               name: name,
+              username: username,
             );
           },
           onForgotPassword: () {
@@ -186,24 +188,24 @@ class _RootShellState extends State<RootShell> {
           body: IndexedStack(index: _tabIndex, children: pages),
           bottomNavigationBar: SafeArea(
             top: false,
-            minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            minimum: const EdgeInsets.fromLTRB(20, 0, 20, 18),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF1D4ED8),
+                    Color(0xFF2563EB),
                     Color(0xFF4F46E5),
                     Color(0xFF7C3AED),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(999),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF312E81).withValues(alpha: 0.26),
-                    blurRadius: 28,
-                    offset: const Offset(0, 16),
+                    color: const Color(0xFF312E81).withValues(alpha: 0.22),
+                    blurRadius: 36,
+                    offset: const Offset(0, 18),
                   ),
                 ],
               ),
@@ -257,32 +259,47 @@ class _BottomNavItem extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(999),
           onTap: onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
               color: selected
-                  ? Colors.white.withValues(alpha: 0.92)
-                  : Colors.white.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: selected
-                    ? Colors.white.withValues(alpha: 0.6)
-                    : Colors.white.withValues(alpha: 0.14),
-              ),
+                  ? Colors.white.withValues(alpha: 0.96)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(999),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFFDBEAFE).withValues(alpha: 0.7),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : null,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  selected ? selectedIcon : icon,
-                  color: foreground,
-                  size: 24,
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? const Color(0xFFE0E7FF)
+                        : Colors.white.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    selected ? selectedIcon : icon,
+                    color: foreground,
+                    size: 22,
+                  ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   label,
                   maxLines: 1,
