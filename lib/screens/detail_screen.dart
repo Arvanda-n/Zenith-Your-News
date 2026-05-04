@@ -55,10 +55,10 @@ class _DetailScreenState extends State<DetailScreen> {
   void _handleBookmark(BuildContext context) {
     final result = widget.controller.toggleBookmark(widget.item.id);
     final message = switch (result) {
-      BookmarkActionResult.added => 'Berita disimpan ke bookmark.',
-      BookmarkActionResult.removed => 'Berita dihapus dari bookmark.',
+      BookmarkActionResult.added => 'Berita disimpan.',
+      BookmarkActionResult.removed => 'Berita dihapus dari simpanan.',
       BookmarkActionResult.loginRequired =>
-        'Login dulu untuk menyimpan bookmark.',
+        'Masuk dulu untuk menyimpan berita.',
     };
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
@@ -124,12 +124,6 @@ class _DetailScreenState extends State<DetailScreen> {
                         ],
                       ),
                     ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.share_outlined),
-                        onPressed: _handleShare,
-                      ),
-                    ],
                     bottom: PreferredSize(
                       preferredSize: const Size.fromHeight(4),
                       child: LinearProgressIndicator(
@@ -176,7 +170,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            '${widget.item.readMinutes} min read • Reading progress ${(100 * _progress).round()}%',
+                            '${widget.item.readMinutes} menit baca • Progres baca ${(100 * _progress).round()}%',
                             style: TextStyle(color: secondaryColor),
                           ),
                           const SizedBox(height: 20),
@@ -191,7 +185,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: _handleShare,
                                   icon: const Icon(Icons.share_outlined),
-                                  label: const Text('Share story'),
+                                  label: const Text('Bagikan berita'),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -204,7 +198,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                         : Icons.bookmark_add_outlined,
                                   ),
                                   label: Text(
-                                    isBookmarked ? 'Saved' : 'Save story',
+                                    isBookmarked ? 'Tersimpan' : 'Simpan berita',
                                   ),
                                 ),
                               ),
@@ -212,7 +206,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                           const SizedBox(height: 28),
                           Text(
-                            'Related stories',
+                            'Berita terkait',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),

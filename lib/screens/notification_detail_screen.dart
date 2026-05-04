@@ -33,10 +33,20 @@ class NotificationDetailScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Notification Detail')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          SafeArea(
+            bottom: false,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

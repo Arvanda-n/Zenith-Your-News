@@ -28,7 +28,6 @@ class BookmarkScreen extends StatelessWidget {
         final isLoggedIn = controller.isLoggedIn;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Bookmarks')),
           body: !isLoggedIn
               ? _BookmarkLockState(onOpenLogin: onOpenLogin)
               : bookmarked.isEmpty
@@ -45,8 +44,9 @@ class BookmarkScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SafeArea(bottom: false, child: SizedBox.shrink()),
                           Text(
-                            '${bookmarked.length} saved stories',
+                            '${bookmarked.length} berita tersimpan',
                             style: Theme.of(context).textTheme.headlineSmall
                                 ?.copyWith(
                                   color: Colors.white,
@@ -157,19 +157,19 @@ class _BookmarkLockState extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Login untuk menyimpan cerita',
+                  'Masuk untuk menyimpan berita',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Buat pengalaman baca yang lebih personal dengan bookmark yang sinkron dengan akun kamu.',
+                  'Buat pengalaman baca yang lebih personal dengan berita tersimpan yang sinkron dengan akun kamu.',
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 18),
                 FilledButton(
                   onPressed: onOpenLogin,
-                  child: const Text('Login sekarang'),
+                  child: const Text('Masuk sekarang'),
                 ),
               ],
             ),
@@ -211,13 +211,13 @@ class _BookmarkEmptyState extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Bookmark kamu masih kosong',
+                  'Simpanan kamu masih kosong',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Simpan artikel terbaik dari Home, Trending, atau Search agar mudah dibaca lagi nanti.',
+                  'Simpan artikel terbaik dari Beranda, Tren, atau Pencarian agar mudah dibaca lagi nanti.',
                   textAlign: TextAlign.center,
                 ),
               ],

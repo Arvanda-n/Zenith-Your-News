@@ -6,10 +6,25 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Forgot Password')),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          SafeArea(
+            bottom: false,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Lupa kata sandi',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
           const Text(
             "Masukkan email akun Anda dan kami akan kirim tautan reset password.",
             style: TextStyle(height: 1.6),
@@ -17,7 +32,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           const SizedBox(height: 18),
           const TextField(decoration: InputDecoration(labelText: 'Email')),
           const SizedBox(height: 14),
-          FilledButton(onPressed: () {}, child: const Text('Send Reset Link')),
+          FilledButton(onPressed: () {}, child: const Text('Kirim tautan reset')),
           const SizedBox(height: 10),
           const Card(
             child: Padding(
@@ -30,7 +45,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           const SizedBox(height: 8),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Back to Login'),
+            child: const Text('Kembali ke Masuk'),
           ),
         ],
       ),

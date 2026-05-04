@@ -167,22 +167,22 @@ class _RootShellState extends State<RootShell> {
               NavigationDestination(
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home_rounded),
-                label: 'Home',
+                label: 'Beranda',
               ),
               NavigationDestination(
                 icon: Icon(Icons.local_fire_department_outlined),
                 selectedIcon: Icon(Icons.local_fire_department),
-                label: 'Trending',
+                label: 'Tren',
               ),
               NavigationDestination(
                 icon: Icon(Icons.bookmark_border),
                 selectedIcon: Icon(Icons.bookmark),
-                label: 'Bookmark',
+                label: 'Simpan',
               ),
               NavigationDestination(
                 icon: Icon(Icons.person_outline),
                 selectedIcon: Icon(Icons.person),
-                label: 'Profile',
+                label: 'Profil',
               ),
             ],
           ),

@@ -24,10 +24,10 @@ class ProfileScreen extends StatelessWidget {
         final isLoggedIn = controller.isLoggedIn;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Profile & Settings')),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              const SafeArea(bottom: false, child: SizedBox.shrink()),
               Container(
                 decoration: BoxDecoration(
                   gradient: AppTheme.brandGradient,
@@ -56,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           Text(
                             isLoggedIn
-                                ? controller.userName ?? 'ZYN Reader'
+                                ? controller.userName ?? 'Pembaca ZYN'
                                 : 'Belum login',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: Colors.white,
@@ -67,7 +67,7 @@ class ProfileScreen extends StatelessWidget {
                           Text(
                             isLoggedIn
                                 ? controller.userEmail ?? ''
-                                : 'Masuk untuk personalisasi, bookmark, dan sinkronisasi preferensi.',
+                                : 'Masuk untuk personalisasi, simpanan, dan sinkronisasi preferensi.',
                             style: const TextStyle(color: Colors.white70, height: 1.45),
                           ),
                         ],
@@ -99,7 +99,7 @@ class ProfileScreen extends StatelessWidget {
                 title: 'Reading Experience',
                 children: [
                   ListTile(
-                    title: const Text('Notification Center'),
+                    title: const Text('Pusat Notifikasi'),
                     subtitle: Text(
                       controller.unreadNotificationCount == 0
                           ? 'Tidak ada notifikasi baru'
@@ -169,7 +169,7 @@ class ProfileScreen extends StatelessWidget {
                   }
                   onOpenLogin();
                 },
-                child: Text(isLoggedIn ? 'Logout' : 'Login'),
+                child: Text(isLoggedIn ? 'Keluar' : 'Masuk'),
               ),
             ],
           ),

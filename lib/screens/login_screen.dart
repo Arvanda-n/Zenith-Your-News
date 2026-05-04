@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Login berhasil. Selamat datang di ZYN.')),
+      const SnackBar(content: Text('Masuk berhasil. Selamat datang di ZYN.')),
     );
     Navigator.of(context).pop();
   }
@@ -58,20 +58,29 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            const SizedBox(height: 20),
+            SafeArea(
+              bottom: false,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_rounded),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             const Text(
-              'Welcome to ZYN',
+              'Masuk ke ZYN',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Login untuk sinkronisasi bookmark dan personalisasi berita.',
+              'Masuk untuk sinkronisasi simpanan dan personalisasi berita.',
             ),
             const SizedBox(height: 24),
             TextFormField(
@@ -115,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             ),
             const SizedBox(height: 18),
-            FilledButton(onPressed: _submit, child: const Text('Login')),
+            FilledButton(onPressed: _submit, child: const Text('Masuk')),
             const SizedBox(height: 10),
             OutlinedButton.icon(
               onPressed: () {
@@ -126,23 +135,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Login Google simulasi berhasil.'),
+                    content: Text('Masuk Google simulasi berhasil.'),
                   ),
                 );
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.g_mobiledata),
-              label: const Text('Continue with Google'),
+              label: const Text('Lanjutkan dengan Google'),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: widget.onForgotPassword,
-              child: const Text('Forgot Password?'),
+              child: const Text('Lupa kata sandi?'),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Skip for now'),
+              child: const Text('Lewati dulu'),
             ),
           ],
         ),

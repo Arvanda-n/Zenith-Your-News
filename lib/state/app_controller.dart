@@ -3,10 +3,10 @@
 import '../models/app_notification.dart';
 
 enum FontScaleOption {
-  small(0.9, 'Small (0.9x)'),
+  small(0.9, 'Kecil (0.9x)'),
   normal(1.0, 'Normal (1.0x)'),
-  large(1.2, 'Large (1.2x)'),
-  extraLarge(1.4, 'Extra Large (1.4x)');
+  large(1.2, 'Besar (1.2x)'),
+  extraLarge(1.4, 'Sangat besar (1.4x)');
 
   const FontScaleOption(this.factor, this.label);
 
@@ -34,7 +34,7 @@ class AppController extends ChangeNotifier {
     ),
     AppNotification(
       id: 'ntf-2',
-      title: 'Trending Update',
+      title: 'Pembaruan Tren',
       message: 'Ekonomi Hijau Dorong Investasi Baru di Asia Tenggara',
       timestamp: DateTime(2026, 4, 28, 7, 10),
       newsId: 'n2',
@@ -139,7 +139,7 @@ class AppController extends ChangeNotifier {
   String _deriveNameFromEmail(String email) {
     final localPart = email.trim().split('@').first;
     if (localPart.isEmpty) {
-      return 'ZYN Reader';
+      return 'Pembaca ZYN';
     }
 
     return localPart

@@ -24,12 +24,19 @@ class TrendingScreen extends StatelessWidget {
     final rest = sorted.skip(3).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Trending Now')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const SafeArea(bottom: false, child: SizedBox.shrink()),
           Text(
-            'Top stories that are shaping the conversation today.',
+            'Sedang tren',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Berita yang paling banyak memicu percakapan hari ini.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
@@ -47,7 +54,7 @@ class TrendingScreen extends StatelessWidget {
           }),
           const SizedBox(height: 10),
           Text(
-            'More momentum',
+            'Tren lainnya',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -86,8 +93,8 @@ class TrendingScreen extends StatelessWidget {
                   ),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      '${item.category} • score ${item.trendingScore}',
+                      child: Text(
+                        '${item.category} • skor ${item.trendingScore}',
                     ),
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded),
@@ -190,7 +197,7 @@ class _PodiumCard extends StatelessWidget {
                         color: Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(width: 6),
-                      Text('Score ${item.trendingScore}'),
+                      Text('Skor ${item.trendingScore}'),
                     ],
                   ),
                 ],

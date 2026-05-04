@@ -58,115 +58,142 @@ class _HomeScreenState extends State<HomeScreen> {
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              child: Container(
+                decoration: const BoxDecoration(gradient: AppTheme.brandGradient),
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 24),
+                child: SafeArea(
+                  bottom: false,
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            'ZYN',
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.controller.isLoggedIn
-                                ? 'Good to see you, ${widget.controller.userName ?? 'Reader'}'
-                                : 'Your premium daily news brief',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: widget.onOpenSearch,
-                      icon: const Icon(Icons.search_rounded),
-                    ),
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          onPressed: widget.onOpenNotifications,
-                          icon: const Icon(Icons.notifications_none_rounded),
-                        ),
-                        if (widget.controller.notificationsEnabled &&
-                            widget.controller.unreadNotificationCount > 0)
-                          Positioned(
-                            right: 8,
-                            top: 8,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: AppTheme.brandGradient,
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                widget.controller.unreadNotificationCount > 9
-                                    ? '9+'
-                                    : '${widget.controller.unreadNotificationCount}',
-                                style: const TextStyle(
+                          Expanded(
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(999),
+                              onTap: widget.onOpenSearch,
+                              child: Ink(
+                                height: 58,
+                                padding: const EdgeInsets.symmetric(horizontal: 18),
+                                decoration: BoxDecoration(
                                   color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.search_rounded,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Telusuri berita, topik, atau kategori...',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withValues(alpha: 0.88),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 360,
-                child: PageView.builder(
-                  controller: _headlineController,
-                  onPageChanged: (value) => setState(() => _headlineIndex = value),
-                  itemCount: featured.length,
-                  itemBuilder: (context, index) {
-                    final item = featured[index];
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      child: _HeadlineCard(
-                        item: item,
-                        onTap: () => widget.onOpenDetail(item),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(featured.length, (index) {
-                    final active = index == _headlineIndex;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: active ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        gradient: active ? AppTheme.brandGradient : null,
-                        color: active
-                            ? null
-                            : Theme.of(context).colorScheme.primary.withValues(
-                                alpha: 0.16,
+                          const SizedBox(width: 12),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              InkWell(
+                                borderRadius: BorderRadius.circular(20),
+                                onTap: widget.onOpenNotifications,
+                                child: Ink(
+                                  width: 58,
+                                  height: 58,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.14),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Icon(
+                                    Icons.notifications_none_rounded,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                        borderRadius: BorderRadius.circular(999),
+                              if (widget.controller.notificationsEnabled &&
+                                  widget.controller.unreadNotificationCount > 0)
+                                Positioned(
+                                  right: -4,
+                                  top: -4,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      widget.controller.unreadNotificationCount > 9
+                                          ? '9+'
+                                          : '${widget.controller.unreadNotificationCount}',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
                       ),
-                    );
-                  }),
+                      const SizedBox(height: 18),
+                      SizedBox(
+                        height: 360,
+                        child: PageView.builder(
+                          controller: _headlineController,
+                          onPageChanged: (value) {
+                            setState(() => _headlineIndex = value);
+                          },
+                          itemCount: featured.length,
+                          itemBuilder: (context, index) {
+                            final item = featured[index];
+                            return _HeadlineCard(
+                              item: item,
+                              onTap: () => widget.onOpenDetail(item),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(featured.length, (index) {
+                          final active = index == _headlineIndex;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: active ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: active
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.42),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -177,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Expanded(
                       child: _QuickActionCard(
-                        title: 'For You',
+                        title: 'Untuk Anda',
                         subtitle: 'Kurasi personal',
                         icon: Icons.auto_awesome_rounded,
                         onTap: widget.onOpenForYou,
@@ -186,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _QuickActionCard(
-                        title: 'Categories',
+                        title: 'Kategori',
                         subtitle: 'Jelajahi topik',
                         icon: Icons.grid_view_rounded,
                         onTap: widget.onOpenCategories,
@@ -203,9 +230,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _SectionHeader(
-                      title: 'For You',
+                      title: 'Untuk Anda',
                       subtitle: 'Pilihan paling relevan berdasarkan momentum hari ini.',
-                      actionLabel: 'Open',
+                      actionLabel: 'Buka',
                       onAction: widget.onOpenForYou,
                     ),
                     const SizedBox(height: 12),
@@ -236,9 +263,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _SectionHeader(
-                      title: 'Browse Topics',
+                      title: 'Jelajahi Topik',
                       subtitle: 'Pindah cepat ke kategori yang kamu suka.',
-                      actionLabel: 'View all',
+                      actionLabel: 'Lihat semua',
                       onAction: widget.onOpenCategories,
                     ),
                     const SizedBox(height: 12),
@@ -262,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                 child: _SectionHeader(
-                  title: 'Latest Stories',
+                  title: 'Berita Terbaru',
                   subtitle: 'Rangkuman berita terbaru yang tetap nyaman dibaca.',
                 ),
               ),
@@ -316,7 +343,7 @@ class _HeadlineCard extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.04),
+                    Colors.black.withValues(alpha: 0.05),
                     Colors.black.withValues(alpha: 0.78),
                   ],
                 ),
@@ -361,7 +388,7 @@ class _HeadlineCard extends StatelessWidget {
                             Icon(Icons.swipe_rounded, color: Colors.white, size: 16),
                             SizedBox(width: 6),
                             Text(
-                              'Swipe',
+                              'Geser',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
@@ -399,11 +426,11 @@ class _HeadlineCard extends StatelessWidget {
                           foregroundColor: Theme.of(context).colorScheme.primary,
                           minimumSize: const Size(0, 48),
                         ),
-                        child: const Text('Read now'),
+                        child: const Text('Baca sekarang'),
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        '${item.readMinutes} min read',
+                        '${item.readMinutes} menit baca',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -632,7 +659,7 @@ class _LatestTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 10),
-                    Text('${item.readMinutes} min read'),
+                    Text('${item.readMinutes} menit baca'),
                   ],
                 ),
               ),
