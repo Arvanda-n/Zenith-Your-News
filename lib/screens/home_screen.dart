@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 252,
+                      height: 300,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: curatedItems.length,
@@ -723,49 +723,60 @@ class _CuratedCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              NewsImage(
-                imageUrl: item.imageUrl,
-                imageHint: item.imageHint,
-                height: 136,
-                borderRadius: BorderRadius.zero,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.categoryLabel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      item.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      item.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                NewsImage(
+                  imageUrl: item.imageUrl,
+                  imageHint: item.imageHint,
+                  height: 136,
+                  borderRadius: BorderRadius.zero,
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.categoryLabel,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.title,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${item.readMinutes} menit baca',
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
       ),
     );
   }
