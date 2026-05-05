@@ -209,17 +209,16 @@ class _RootShellState extends State<RootShell> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(items.length, (index) {
                     final item = items[index];
                     final selected = index == _tabIndex;
-                    return Expanded(
-                      child: _BottomNavItem(
-                        label: item.label,
-                        icon: item.icon,
-                        selectedIcon: item.selectedIcon,
-                        selected: selected,
-                        onTap: () => setState(() => _tabIndex = index),
-                      ),
+                    return _BottomNavItem(
+                      label: item.label,
+                      icon: item.icon,
+                      selectedIcon: item.selectedIcon,
+                      selected: selected,
+                      onTap: () => setState(() => _tabIndex = index),
                     );
                   }),
                 ),
@@ -251,6 +250,11 @@ class _BottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final inactiveColor = const Color(0xFF8C7AAE);
     final activeForeground = const Color(0xFF3F2D7A);
+    final activeWidth = switch (label) {
+      'Beranda' => 122.0,
+      'Simpan' => 116.0,
+      _ => 108.0,
+    };
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -262,6 +266,7 @@ class _BottomNavItem extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 240),
             curve: Curves.easeOutCubic,
+            width: selected ? activeWidth : 56,
             height: 56,
             padding: EdgeInsets.symmetric(
               horizontal: selected ? 16 : 0,
@@ -282,7 +287,7 @@ class _BottomNavItem extends StatelessWidget {
             ),
             child: selected
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Icon(selectedIcon, color: activeForeground, size: 22),
                       const SizedBox(width: 10),
