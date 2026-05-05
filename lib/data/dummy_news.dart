@@ -344,7 +344,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 5,
     imageHint: 'Online Learning',
     imageUrl:
-        'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 90,
   ),
   _newsItem(
@@ -359,7 +359,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: 'Student Portfolio',
     imageUrl:
-        'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/6147369/pexels-photo-6147369.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 87,
   ),
   _newsItem(
@@ -374,7 +374,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 5,
     imageHint: 'Night Class',
     imageUrl:
-        'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/8471822/pexels-photo-8471822.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 84,
   ),
   _newsItem(
@@ -389,7 +389,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: 'Library Study',
     imageUrl:
-        'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/159740/library-la-trobe-study-students-159740.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 81,
   ),
   _newsItem(
@@ -404,7 +404,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 5,
     imageHint: 'Math Class',
     imageUrl:
-        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/8471798/pexels-photo-8471798.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 79,
   ),
   _newsItem(
@@ -495,7 +495,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 6,
     imageHint: 'Electric Battery',
     imageUrl:
-        'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/9800005/pexels-photo-9800005.jpeg?auto=compress&cs=tinysrgb&w=1200',
     featured: true,
     trendingScore: 95,
   ),
@@ -511,7 +511,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 5,
     imageHint: 'Fishing Sensor',
     imageUrl:
-        'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/1001682/pexels-photo-1001682.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 89,
   ),
   _newsItem(
@@ -526,7 +526,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: '3D Printer',
     imageUrl:
-        'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 85,
   ),
   _newsItem(
@@ -541,7 +541,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 5,
     imageHint: 'Eco Packaging',
     imageUrl:
-        'https://images.unsplash.com/photo-1499096382193-ebb232527fee?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/4498136/pexels-photo-4498136.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 82,
   ),
   _newsItem(
@@ -556,7 +556,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: 'Audio Recorder',
     imageUrl:
-        'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/164938/pexels-photo-164938.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 79,
   ),
   _newsItem(
@@ -571,7 +571,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: 'Ocean Travel',
     imageUrl:
-        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 88,
   ),
   _newsItem(
@@ -586,7 +586,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: 'Mountain Train',
     imageUrl:
-        'https://images.unsplash.com/photo-1500534314209-a26db0f5b2fd?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/210243/pexels-photo-210243.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 85,
   ),
   _newsItem(
@@ -601,7 +601,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 5,
     imageHint: 'Coffee Village',
     imageUrl:
-        'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 83,
   ),
   _newsItem(
@@ -616,7 +616,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: 'Heritage Hotel',
     imageUrl:
-        'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 80,
   ),
   _newsItem(
@@ -631,7 +631,7 @@ final List<NewsItem> dummyNews = <NewsItem>[
     readMinutes: 4,
     imageHint: 'Mountain Hike',
     imageUrl:
-        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
+        'https://images.pexels.com/photos/691668/pexels-photo-691668.jpeg?auto=compress&cs=tinysrgb&w=1200',
     trendingScore: 78,
   ),
   _newsItem(
