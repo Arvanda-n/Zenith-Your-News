@@ -11,33 +11,55 @@ import 'theme/app_theme.dart';
 import 'utils/news_category.dart';
 
 class ZynApp extends StatefulWidget {
-  const ZynApp({super.key});
+  const ZynApp({super.key, this.controller});
+
+  final AppController? controller;
 
   @override
   State<ZynApp> createState() => _ZynAppState();
 }
 
 class _ZynAppState extends State<ZynApp> {
-  final AppController _controller = AppController();
+  late final AppController _controller;
+  late final bool _ownsController;
   bool _showSplash = true;
+  bool _splashElapsed = false;
   Timer? _splashTimer;
 
   @override
   void initState() {
     super.initState();
+    _controller = widget.controller ?? AppController();
+    _ownsController = widget.controller == null;
     _splashTimer = Timer(const Duration(milliseconds: 1900), () {
       if (!mounted) {
         return;
       }
-      setState(() => _showSplash = false);
+      _splashElapsed = true;
+      _syncLaunchState();
+    });
+    _controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      _syncLaunchState();
     });
   }
 
   @override
   void dispose() {
     _splashTimer?.cancel();
-    _controller.dispose();
+    if (_ownsController) {
+      _controller.dispose();
+    }
     super.dispose();
+  }
+
+  void _syncLaunchState() {
+    final shouldShowSplash = !_splashElapsed || !_controller.isReady;
+    if (_showSplash != shouldShowSplash) {
+      setState(() => _showSplash = shouldShowSplash);
+    }
   }
 
   @override
@@ -71,15 +93,15 @@ class _ZynAppState extends State<ZynApp> {
             child: _showSplash
                 ? const SplashScreen()
                 : _controller.hasCompletedOnboarding
-                    ? RootShell(
-                        key: const ValueKey('root_shell'),
-                        controller: _controller,
-                      )
-                    : OnboardingScreen(
-                        key: const ValueKey('onboarding_screen'),
-                        availableCategories: availableCategories,
-                        onComplete: _controller.completeOnboarding,
-                      ),
+                ? RootShell(
+                    key: const ValueKey('root_shell'),
+                    controller: _controller,
+                  )
+                : OnboardingScreen(
+                    key: const ValueKey('onboarding_screen'),
+                    availableCategories: availableCategories,
+                    onComplete: _controller.completeOnboarding,
+                  ),
           ),
         );
       },

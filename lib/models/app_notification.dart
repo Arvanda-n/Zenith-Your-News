@@ -25,4 +25,26 @@ class AppNotification {
       isRead: isRead ?? this.isRead,
     );
   }
+
+  Map<String, Object?> toMap() {
+    return <String, Object?>{
+      'id': id,
+      'title': title,
+      'message': message,
+      'timestamp': timestamp.toIso8601String(),
+      'newsId': newsId,
+      'isRead': isRead,
+    };
+  }
+
+  factory AppNotification.fromMap(Map<String, Object?> map) {
+    return AppNotification(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      message: map['message'] as String,
+      timestamp: DateTime.parse(map['timestamp'] as String),
+      newsId: map['newsId'] as String?,
+      isRead: (map['isRead'] as bool?) ?? false,
+    );
+  }
 }

@@ -42,6 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final compactLayout = media.size.width < 380;
+    final accessibilityLayout = media.textScaler.scale(1) > 1.15;
     final preferredCategories = widget.controller.preferredCategories;
     final featuredItems = _prioritizeByPreference(
       widget.news.where((item) => item.featured),
@@ -61,7 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ifAbsent: () => 1,
       );
     }
-    final categoryEntries = highlightedCategories.entries.take(6).toList();
+    final categoryEntries = highlightedCategories.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     final greeting = widget.controller.isLoggedIn
         ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
@@ -86,10 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     featuredItems: featuredItems,
                     headlineController: _headlineController,
                     headlineIndex: _headlineIndex,
+                    compactLayout: compactLayout,
                     unreadNotificationCount:
                         widget.controller.notificationsEnabled
-                            ? widget.controller.unreadNotificationCount
-                            : 0,
+                        ? widget.controller.unreadNotificationCount
+                        : 0,
                     onOpenSearch: widget.onOpenSearch,
                     onOpenNotifications: widget.onOpenNotifications,
                     onPageChanged: (value) =>
@@ -141,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 324,
+                      height: compactLayout || accessibilityLayout ? 308 : 324,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: curatedItems.length,
@@ -151,6 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           final item = curatedItems[index];
                           return _CuratedCard(
                             item: item,
+                            compactLayout: compactLayout,
                             onTap: () => widget.onOpenDetail(item),
                           );
                         },
@@ -168,7 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _SectionHeader(
                       title: 'Jelajahi Topik',
-                      subtitle: 'Semua kategori sudah dirapikan agar pengalaman membaca terasa lebih lengkap.',
+                      subtitle:
+                          'Semua kategori sudah dirapikan agar pengalaman membaca terasa lebih lengkap.',
                       actionLabel: 'Lihat semua',
                       onAction: widget.onOpenCategories,
                     ),
@@ -194,7 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                 child: _SectionHeader(
                   title: 'Berita Terbaru',
-                  subtitle: 'Rangkuman berita terbaru yang tetap nyaman dibaca.',
+                  subtitle:
+                      'Rangkuman berita terbaru yang tetap nyaman dibaca.',
                 ),
               ),
             ),
@@ -208,6 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _LatestTile(
                       item: item,
+                      compactLayout: compactLayout || accessibilityLayout,
                       onTap: () => widget.onOpenDetail(item),
                     ),
                   );
@@ -264,6 +273,7 @@ class _TopHeroSection extends StatelessWidget {
     required this.featuredItems,
     required this.headlineController,
     required this.headlineIndex,
+    required this.compactLayout,
     required this.unreadNotificationCount,
     required this.onOpenSearch,
     required this.onOpenNotifications,
@@ -276,6 +286,7 @@ class _TopHeroSection extends StatelessWidget {
   final List<NewsItem> featuredItems;
   final PageController headlineController;
   final int headlineIndex;
+  final bool compactLayout;
   final int unreadNotificationCount;
   final VoidCallback onOpenSearch;
   final VoidCallback onOpenNotifications;
@@ -289,11 +300,7 @@ class _TopHeroSection extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1D4ED8),
-            Color(0xFF4F46E5),
-            Color(0xFF7C3AED),
-          ],
+          colors: [Color(0xFF1D4ED8), Color(0xFF4F46E5), Color(0xFF7C3AED)],
         ),
         borderRadius: BorderRadius.circular(32),
       ),
@@ -319,6 +326,8 @@ class _TopHeroSection extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         greeting,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -372,6 +381,8 @@ class _TopHeroSection extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               preferenceSummary,
+              maxLines: compactLayout ? 3 : 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 14,
@@ -381,7 +392,7 @@ class _TopHeroSection extends StatelessWidget {
             const SizedBox(height: 18),
             if (featuredItems.isNotEmpty) ...[
               SizedBox(
-                height: 320,
+                height: compactLayout ? 336 : 320,
                 child: PageView.builder(
                   controller: headlineController,
                   onPageChanged: onPageChanged,
@@ -588,7 +599,9 @@ class _HeadlineCard extends StatelessWidget {
                         onPressed: onTap,
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           minimumSize: const Size(0, 48),
                         ),
                         child: const Text('Baca sekarang'),
@@ -693,9 +706,9 @@ class _SectionHeader extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
               Text(subtitle),
@@ -710,15 +723,20 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _CuratedCard extends StatelessWidget {
-  const _CuratedCard({required this.item, required this.onTap});
+  const _CuratedCard({
+    required this.item,
+    required this.compactLayout,
+    required this.onTap,
+  });
 
   final NewsItem item;
+  final bool compactLayout;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 264,
+      width: compactLayout ? 236 : 264,
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -788,9 +806,14 @@ class _CuratedCard extends StatelessWidget {
 }
 
 class _LatestTile extends StatelessWidget {
-  const _LatestTile({required this.item, required this.onTap});
+  const _LatestTile({
+    required this.item,
+    required this.compactLayout,
+    required this.onTap,
+  });
 
   final NewsItem item;
+  final bool compactLayout;
   final VoidCallback onTap;
 
   @override
@@ -801,53 +824,62 @@ class _LatestTile extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Row(
+          child: Flex(
+            direction: compactLayout ? Axis.vertical : Axis.horizontal,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NewsImage(
                 imageUrl: item.imageUrl,
                 imageHint: item.imageHint,
-                width: 104,
+                width: compactLayout ? double.infinity : 104,
                 height: 104,
                 borderRadius: BorderRadius.circular(18),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.categoryLabel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      item.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      item.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 10),
-                    Text('${item.readMinutes} menit baca'),
-                  ],
-                ),
+              SizedBox(
+                width: compactLayout ? 0 : 14,
+                height: compactLayout ? 12 : 0,
               ),
+              if (compactLayout)
+                _LatestTileContent(item: item)
+              else
+                Expanded(child: _LatestTileContent(item: item)),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LatestTileContent extends StatelessWidget {
+  const _LatestTileContent({required this.item});
+
+  final NewsItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          item.categoryLabel,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          item.title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        ),
+        const SizedBox(height: 8),
+        Text(item.description, maxLines: 2, overflow: TextOverflow.ellipsis),
+        const SizedBox(height: 10),
+        Text('${item.readMinutes} menit baca'),
+      ],
     );
   }
 }

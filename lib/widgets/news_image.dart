@@ -29,6 +29,38 @@ class NewsImage extends StatelessWidget {
             Image.network(
               imageUrl,
               fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                }
+
+                final expectedBytes = loadingProgress.expectedTotalBytes;
+                final loadedBytes = loadingProgress.cumulativeBytesLoaded;
+                final progress = expectedBytes == null || expectedBytes == 0
+                    ? null
+                    : loadedBytes / expectedBytes;
+
+                return DecoratedBox(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF1D4ED8), Color(0xFF4F46E5)],
+                    ),
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      width: 26,
+                      height: 26,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.4,
+                        value: progress,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                );
+              },
               errorBuilder: (context, error, stackTrace) {
                 return DecoratedBox(
                   decoration: const BoxDecoration(

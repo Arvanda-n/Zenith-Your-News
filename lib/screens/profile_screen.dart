@@ -58,10 +58,11 @@ class ProfileScreen extends StatelessWidget {
                             isLoggedIn
                                 ? controller.userName ?? 'Pembaca ZYN'
                                 : 'Belum masuk',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -87,13 +88,26 @@ class ProfileScreen extends StatelessWidget {
                     value: isDark,
                     onChanged: controller.toggleTheme,
                     title: const Text('Mode gelap'),
-                    subtitle: const Text('Tampilan yang lebih fokus untuk malam hari'),
+                    subtitle: const Text(
+                      'Tampilan yang lebih fokus untuk malam hari',
+                    ),
                   ),
                   SwitchListTile(
                     value: controller.notificationsEnabled,
                     onChanged: controller.toggleNotifications,
                     title: const Text('Notifikasi'),
-                    subtitle: const Text('Aktifkan update breaking news dan ringkasan harian'),
+                    subtitle: const Text(
+                      'Aktifkan update breaking news dan ringkasan harian',
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Status sesi'),
+                    subtitle: Text(
+                      isLoggedIn
+                          ? 'Akun, simpanan, dan preferensi akan dipulihkan saat aplikasi dibuka lagi.'
+                          : 'Onboarding dan minat tetap disimpan secara lokal di perangkat ini.',
+                    ),
+                    leading: const Icon(Icons.verified_user_outlined),
                   ),
                 ],
               ),
@@ -128,7 +142,8 @@ class ProfileScreen extends StatelessWidget {
                             return ChoiceChip(
                               label: Text(option.label),
                               selected: option == controller.fontScale,
-                              onSelected: (_) => controller.setFontScale(option),
+                              onSelected: (_) =>
+                                  controller.setFontScale(option),
                             );
                           }).toList(),
                         ),
@@ -137,6 +152,32 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              if (controller.preferredCategories.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                _ProfileGroup(
+                  title: 'Minat Anda',
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: controller.preferredCategories.map((
+                          category,
+                        ) {
+                          return Chip(
+                            label: Text(category),
+                            avatar: const Icon(
+                              Icons.interests_rounded,
+                              size: 18,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 14),
               _ProfileGroup(
                 title: 'Tentang',
@@ -200,9 +241,9 @@ class _ProfileGroup extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(18, 12, 18, 8),
               child: Text(
                 title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
             ),
             ...children,
