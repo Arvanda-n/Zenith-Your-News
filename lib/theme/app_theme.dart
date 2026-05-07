@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFF6D5EF8);
-  static const Color secondary = Color(0xFF1EA7FF);
-  static const Color accent = Color(0xFF8F7CFF);
-  static const Color lightBackground = Color(0xFFF6F8FC);
-  static const Color darkBackground = Color(0xFF0A1020);
-  static const Color darkSurface = Color(0xFF121A2E);
+  static const Color primary = Color(0xFF1877F2);
+  static const Color secondary = Color(0xFF2EC5FF);
+  static const Color accent = Color(0xFF4E8CFF);
+  static const Color lightBackground = Color(0xFFF4F8FE);
+  static const Color darkBackground = Color(0xFF08101F);
+  static const Color darkSurface = Color(0xFF101A30);
   static const Color lightText = Color(0xFF121826);
   static const Color darkText = Color(0xFFF5F7FF);
   static const Color lightSecondaryText = Color(0xFF63708A);
@@ -57,6 +57,7 @@ class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
+      dividerColor: primary.withValues(alpha: 0.10),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
@@ -70,7 +71,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(color: primary.withValues(alpha: 0.08)),
+          borderSide: BorderSide(color: primary.withValues(alpha: 0.10)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
@@ -145,6 +146,7 @@ class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
+      dividerColor: Colors.white.withValues(alpha: 0.10),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: darkSurface,

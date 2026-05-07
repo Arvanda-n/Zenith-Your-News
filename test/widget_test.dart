@@ -24,7 +24,7 @@ void main() {
       await tester.tap(find.text('Lanjutkan ke Beranda'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Masuk ke ZYN'), findsOneWidget);
+      expect(find.text('Akun ZYN'), findsOneWidget);
       expect(find.text('Lewati dulu'), findsOneWidget);
 
       await tester.tap(find.text('Lewati dulu'));
@@ -41,7 +41,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Mulai dengan ZYN'), findsNothing);
-      expect(find.text('Masuk ke ZYN'), findsNothing);
+      expect(find.text('Akun ZYN'), findsNothing);
       expect(find.text('Beranda'), findsOneWidget);
     },
   );

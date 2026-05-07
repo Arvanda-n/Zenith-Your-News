@@ -28,6 +28,19 @@ class RootShell extends StatefulWidget {
 
 class _RootShellState extends State<RootShell> {
   int _tabIndex = 0;
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   void _openDetail(NewsItem item) {
     Navigator.of(context).push(
@@ -187,10 +200,15 @@ class _RootShellState extends State<RootShell> {
       builder: (context, _) {
         return Scaffold(
           extendBody: true,
-          body: IndexedStack(index: _tabIndex, children: pages),
+          body: PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: (value) => setState(() => _tabIndex = value),
+            children: pages,
+          ),
           bottomNavigationBar: SafeArea(
             top: false,
-            minimum: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+            minimum: const EdgeInsets.fromLTRB(16, 0, 16, 18),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: isDark
@@ -222,8 +240,8 @@ class _RootShellState extends State<RootShell> {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
+                  horizontal: 12,
+                  vertical: 10,
                 ),
                 child: Row(
                   children: List.generate(items.length, (index) {
@@ -236,7 +254,17 @@ class _RootShellState extends State<RootShell> {
                         selectedIcon: item.selectedIcon,
                         selected: selected,
                         isDark: isDark,
-                        onTap: () => setState(() => _tabIndex = index),
+                        onTap: () {
+                          if (_tabIndex == index) {
+                            return;
+                          }
+                          setState(() => _tabIndex = index);
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 360),
+                            curve: Curves.easeOutCubic,
+                          );
+                        },
                       ),
                     );
                   }),
@@ -280,11 +308,11 @@ class _BottomNavItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           onTap: onTap,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 240),
+            duration: const Duration(milliseconds: 320),
             curve: Curves.easeOutCubic,
-            height: 56,
+            height: 60,
             padding: EdgeInsets.symmetric(
-              horizontal: selected ? 12 : 0,
+              horizontal: selected ? 10 : 0,
               vertical: 6,
             ),
             decoration: BoxDecoration(
@@ -302,27 +330,54 @@ class _BottomNavItem extends StatelessWidget {
                   : Colors.white.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(999),
             ),
-            child: selected
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(selectedIcon, color: activeForeground, size: 22),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        child: Text(
-                          label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: activeForeground,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Center(child: Icon(icon, color: inactiveColor, size: 24)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedSlide(
+                  duration: const Duration(milliseconds: 280),
+                  offset: selected ? Offset.zero : const Offset(0, 0.08),
+                  curve: Curves.easeOutCubic,
+                  child: AnimatedScale(
+                    duration: const Duration(milliseconds: 280),
+                    scale: selected ? 1.08 : 1,
+                    curve: Curves.easeOutBack,
+                    child: Icon(
+                      selected ? selectedIcon : icon,
+                      color: selected ? activeForeground : inactiveColor,
+                      size: selected ? 24 : 23,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeOutCubic,
+                  style: TextStyle(
+                    color: selected ? activeForeground : inactiveColor,
+                    fontSize: selected ? 11.8 : 11.2,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  margin: const EdgeInsets.only(top: 4),
+                  width: selected ? 18 : 0,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? (isDark ? Colors.white : const Color(0xFF1B5FFF))
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
