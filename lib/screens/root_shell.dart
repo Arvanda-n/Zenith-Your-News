@@ -45,7 +45,8 @@ class _RootShellState extends State<RootShell> {
   void _openSearch() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => SearchScreen(news: dummyNews, onOpenDetail: _openDetail),
+        builder: (_) =>
+            SearchScreen(news: dummyNews, onOpenDetail: _openDetail),
       ),
     );
   }
@@ -65,10 +66,8 @@ class _RootShellState extends State<RootShell> {
   void _openCategories() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => CategoryScreen(
-          news: dummyNews,
-          onOpenDetail: _openDetail,
-        ),
+        builder: (_) =>
+            CategoryScreen(news: dummyNews, onOpenDetail: _openDetail),
       ),
     );
   }
@@ -104,19 +103,20 @@ class _RootShellState extends State<RootShell> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => LoginScreen(
-          onLogin: ({
-            required String email,
-            required String password,
-            String? name,
-            String? username,
-          }) {
-            widget.controller.login(
-              email: email,
-              password: password,
-              name: name,
-              username: username,
-            );
-          },
+          onLogin:
+              ({
+                required String email,
+                required String password,
+                String? name,
+                String? username,
+              }) {
+                widget.controller.login(
+                  email: email,
+                  password: password,
+                  name: name,
+                  username: username,
+                );
+              },
           onForgotPassword: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
@@ -129,6 +129,8 @@ class _RootShellState extends State<RootShell> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final pages = <Widget>[
       HomeScreen(
         controller: widget.controller,
@@ -191,34 +193,51 @@ class _RootShellState extends State<RootShell> {
             minimum: const EdgeInsets.fromLTRB(20, 0, 20, 18),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark
+                    ? const Color(0xFF161B2E).withValues(alpha: 0.96)
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : const Color(0xFF4F46E5).withValues(alpha: 0.08),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4F46E5).withValues(alpha: 0.12),
+                    color: (isDark ? Colors.black : const Color(0xFF4F46E5))
+                        .withValues(alpha: isDark ? 0.30 : 0.12),
                     blurRadius: 36,
                     offset: const Offset(0, 18),
                   ),
                   BoxShadow(
-                    color: const Color(0xFF1D4ED8).withValues(alpha: 0.08),
+                    color:
+                        (isDark
+                                ? const Color(0xFF312E81)
+                                : const Color(0xFF1D4ED8))
+                            .withValues(alpha: isDark ? 0.22 : 0.08),
                     blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(items.length, (index) {
                     final item = items[index];
                     final selected = index == _tabIndex;
-                    return _BottomNavItem(
-                      label: item.label,
-                      icon: item.icon,
-                      selectedIcon: item.selectedIcon,
-                      selected: selected,
-                      onTap: () => setState(() => _tabIndex = index),
+                    return Expanded(
+                      child: _BottomNavItem(
+                        label: item.label,
+                        icon: item.icon,
+                        selectedIcon: item.selectedIcon,
+                        selected: selected,
+                        isDark: isDark,
+                        onTap: () => setState(() => _tabIndex = index),
+                      ),
                     );
                   }),
                 ),
@@ -237,6 +256,7 @@ class _BottomNavItem extends StatelessWidget {
     required this.icon,
     required this.selectedIcon,
     required this.selected,
+    required this.isDark,
     required this.onTap,
   });
 
@@ -244,17 +264,13 @@ class _BottomNavItem extends StatelessWidget {
   final IconData icon;
   final IconData selectedIcon;
   final bool selected;
+  final bool isDark;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final inactiveColor = const Color(0xFF8C7AAE);
-    final activeForeground = const Color(0xFF3F2D7A);
-    final activeWidth = switch (label) {
-      'Beranda' => 122.0,
-      'Simpan' => 116.0,
-      _ => 108.0,
-    };
+    final inactiveColor = isDark ? Colors.white70 : const Color(0xFF8C7AAE);
+    final activeForeground = isDark ? Colors.white : const Color(0xFF3F2D7A);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -266,28 +282,29 @@ class _BottomNavItem extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 240),
             curve: Curves.easeOutCubic,
-            width: selected ? activeWidth : 56,
             height: 56,
             padding: EdgeInsets.symmetric(
-              horizontal: selected ? 16 : 0,
+              horizontal: selected ? 12 : 0,
               vertical: 6,
             ),
             decoration: BoxDecoration(
               gradient: selected
-                  ? const LinearGradient(
+                  ? LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFE0E7FF),
-                        Color(0xFFEDE9FE),
-                      ],
+                      colors: isDark
+                          ? const [Color(0xFF3B82F6), Color(0xFF7C3AED)]
+                          : const [Color(0xFFE0E7FF), Color(0xFFEDE9FE)],
                     )
                   : null,
+              color: selected || !isDark
+                  ? null
+                  : Colors.white.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(999),
             ),
             child: selected
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(selectedIcon, color: activeForeground, size: 22),
                       const SizedBox(width: 10),
@@ -305,9 +322,7 @@ class _BottomNavItem extends StatelessWidget {
                       ),
                     ],
                   )
-                : Center(
-                    child: Icon(icon, color: inactiveColor, size: 24),
-                  ),
+                : Center(child: Icon(icon, color: inactiveColor, size: 24)),
           ),
         ),
       ),

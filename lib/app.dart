@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'data/dummy_news.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/root_shell.dart';
+import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
 import 'state/app_controller.dart';
 import 'theme/app_theme.dart';
@@ -93,10 +94,31 @@ class _ZynAppState extends State<ZynApp> {
             child: _showSplash
                 ? const SplashScreen()
                 : _controller.hasCompletedOnboarding
-                ? RootShell(
-                    key: const ValueKey('root_shell'),
-                    controller: _controller,
-                  )
+                ? _controller.isLoggedIn || _controller.hasCompletedAuthGate
+                      ? RootShell(
+                          key: const ValueKey('root_shell'),
+                          controller: _controller,
+                        )
+                      : LoginScreen(
+                          key: const ValueKey('login_gate_screen'),
+                          showBackButton: false,
+                          canSkip: true,
+                          onSkip: _controller.completeAuthGate,
+                          onLogin:
+                              ({
+                                required String email,
+                                required String password,
+                                String? name,
+                                String? username,
+                              }) {
+                                _controller.login(
+                                  email: email,
+                                  password: password,
+                                  name: name,
+                                  username: username,
+                                );
+                              },
+                        )
                 : OnboardingScreen(
                     key: const ValueKey('onboarding_screen'),
                     availableCategories: availableCategories,

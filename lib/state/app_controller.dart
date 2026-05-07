@@ -27,6 +27,7 @@ class AppController extends ChangeNotifier {
   static const _notificationsEnabledKey = 'notifications_enabled';
   static const _isLoggedInKey = 'is_logged_in';
   static const _hasCompletedOnboardingKey = 'has_completed_onboarding';
+  static const _hasCompletedAuthGateKey = 'has_completed_auth_gate';
   static const _userNameKey = 'user_name';
   static const _userHandleKey = 'user_handle';
   static const _userEmailKey = 'user_email';
@@ -41,6 +42,7 @@ class AppController extends ChangeNotifier {
   bool _isLoggedIn = false;
   bool _isReady = false;
   bool _hasCompletedOnboarding = false;
+  bool _hasCompletedAuthGate = false;
   String? _userName;
   String? _userHandle;
   String? _userEmail;
@@ -82,6 +84,7 @@ class AppController extends ChangeNotifier {
   bool get notificationsEnabled => _notificationsEnabled;
   bool get isLoggedIn => _isLoggedIn;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
+  bool get hasCompletedAuthGate => _hasCompletedAuthGate;
   String? get userName => _userName;
   String? get userHandle => _userHandle;
   String? get userEmail => _userEmail;
@@ -120,6 +123,17 @@ class AppController extends ChangeNotifier {
             .where((item) => item.isNotEmpty),
       );
     _hasCompletedOnboarding = true;
+    _hasCompletedAuthGate = false;
+    _persistState();
+    notifyListeners();
+  }
+
+  void completeAuthGate() {
+    if (_hasCompletedAuthGate) {
+      return;
+    }
+
+    _hasCompletedAuthGate = true;
     _persistState();
     notifyListeners();
   }
@@ -184,6 +198,7 @@ class AppController extends ChangeNotifier {
     _userHandle = _normalizeUsername(
       username?.trim().isNotEmpty == true ? username!.trim() : email,
     );
+    _hasCompletedAuthGate = true;
     _persistState();
     notifyListeners();
   }
@@ -228,6 +243,7 @@ class AppController extends ChangeNotifier {
       _hasCompletedOnboardingKey,
       _hasCompletedOnboarding,
     );
+    await preferences.setBool(_hasCompletedAuthGateKey, _hasCompletedAuthGate);
     await preferences.setStringList(
       _preferredCategoriesKey,
       _preferredCategories.toList(),
@@ -275,6 +291,8 @@ class AppController extends ChangeNotifier {
     _isLoggedIn = preferences.getBool(_isLoggedInKey) ?? false;
     _hasCompletedOnboarding =
         preferences.getBool(_hasCompletedOnboardingKey) ?? false;
+    _hasCompletedAuthGate =
+        preferences.getBool(_hasCompletedAuthGateKey) ?? false;
     _userName = preferences.getString(_userNameKey);
     _userHandle = preferences.getString(_userHandleKey);
     _userEmail = preferences.getString(_userEmailKey);

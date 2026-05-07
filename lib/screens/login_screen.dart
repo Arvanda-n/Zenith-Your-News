@@ -7,11 +7,17 @@ enum _AuthMode { masuk, daftar }
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
-    required this.onForgotPassword,
     required this.onLogin,
+    this.onForgotPassword,
+    this.onSkip,
+    this.canSkip = true,
+    this.showBackButton = true,
   });
 
-  final VoidCallback onForgotPassword;
+  final VoidCallback? onForgotPassword;
+  final VoidCallback? onSkip;
+  final bool canSkip;
+  final bool showBackButton;
   final void Function({
     required String email,
     required String password,
@@ -69,7 +75,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-    Navigator.of(context).pop();
+    Navigator.of(context).maybePop();
+  }
+
+  void _skip() {
+    widget.onSkip?.call();
+    Navigator.of(context).maybePop();
   }
 
   Future<void> _handleSocialAuth(_SocialProvider provider) async {
@@ -102,193 +113,280 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-    Navigator.of(context).pop();
+    Navigator.of(context).maybePop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            SafeArea(
-              bottom: false,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.arrow_back_rounded),
+      body: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              theme.colorScheme.primary.withValues(alpha: 0.08),
+              theme.colorScheme.surface,
+              theme.colorScheme.surface,
+            ],
+          ),
+        ),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            children: [
+              SafeArea(
+                bottom: false,
+                child: Row(
+                  children: [
+                    if (widget.showBackButton)
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.arrow_back_rounded),
+                      )
+                    else
+                      const SizedBox(width: 12, height: 48),
+                    const Spacer(),
+                    if (widget.canSkip)
+                      TextButton(
+                        onPressed: _skip,
+                        child: const Text('Lewati dulu'),
+                      ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                gradient: AppTheme.brandGradient,
-                borderRadius: BorderRadius.circular(28),
+              const SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.brandGradient,
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.18),
+                      blurRadius: 30,
+                      offset: const Offset(0, 16),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.fromLTRB(22, 24, 22, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Text(
+                        'Akun ZYN',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _isRegisterMode ? 'Daftar ke ZYN' : 'Masuk ke ZYN',
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _isRegisterMode
+                          ? 'Buat akun untuk simpanan berita, personalisasi minat, dan sinkronisasi lintas sesi.'
+                          : 'Masuk untuk sinkronisasi simpanan, preferensi berita, dan pengalaman membaca yang lebih personal.',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 18),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Pilih mode akun',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Masuk lebih dulu untuk sinkronisasi, atau lewati dan lanjut membaca.',
+                      ),
+                      const SizedBox(height: 16),
+                      SegmentedButton<_AuthMode>(
+                        expandedInsets: EdgeInsets.zero,
+                        segments: const [
+                          ButtonSegment<_AuthMode>(
+                            value: _AuthMode.masuk,
+                            label: Text('Masuk'),
+                          ),
+                          ButtonSegment<_AuthMode>(
+                            value: _AuthMode.daftar,
+                            label: Text('Daftar'),
+                          ),
+                        ],
+                        selected: <_AuthMode>{_mode},
+                        onSelectionChanged: (value) =>
+                            setState(() => _mode = value.first),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    children: [
+                      if (_isRegisterMode) ...[
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nama tampilan',
+                          ),
+                          validator: (value) {
+                            if (_isRegisterMode &&
+                                (value?.trim().isEmpty ?? true)) {
+                              return 'Nama tampilan wajib diisi';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _usernameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Username',
+                          ),
+                          validator: (value) {
+                            final username = value?.trim() ?? '';
+                            if (_isRegisterMode && username.isEmpty) {
+                              return 'Username wajib diisi';
+                            }
+                            if (username.isNotEmpty && username.length < 4) {
+                              return 'Username minimal 4 karakter';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                      ] else ...[
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nama tampilan',
+                            hintText: 'Opsional untuk melengkapi profil',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(labelText: 'Email'),
+                        validator: (value) {
+                          final email = value?.trim() ?? '';
+                          if (email.isEmpty) {
+                            return 'Email wajib diisi';
+                          }
+                          if (!email.contains('@') || !email.contains('.')) {
+                            return 'Format email belum valid';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _hidePassword,
+                        decoration: InputDecoration(
+                          labelText: 'Kata sandi',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _hidePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () =>
+                                setState(() => _hidePassword = !_hidePassword),
+                          ),
+                        ),
+                        validator: (value) {
+                          if ((value ?? '').length < 6) {
+                            return 'Kata sandi minimal 6 karakter';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      FilledButton(
+                        onPressed: _submit,
+                        child: Text(
+                          _isRegisterMode
+                              ? 'Daftar dengan Email'
+                              : 'Masuk dengan Email',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
                 children: [
-                  Text(
-                    _isRegisterMode ? 'Daftar ke ZYN' : 'Masuk ke ZYN',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
+                  Expanded(child: Divider(color: theme.dividerColor)),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('atau lanjutkan dengan'),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _isRegisterMode
-                        ? 'Buat akun untuk simpanan berita, personalisasi minat, dan sinkronisasi lintas sesi.'
-                        : 'Masuk untuk sinkronisasi simpanan, preferensi berita, dan pengalaman membaca yang lebih personal.',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      height: 1.5,
-                    ),
-                  ),
+                  Expanded(child: Divider(color: theme.dividerColor)),
                 ],
               ),
-            ),
-            const SizedBox(height: 18),
-            SegmentedButton<_AuthMode>(
-              segments: const [
-                ButtonSegment<_AuthMode>(
-                  value: _AuthMode.masuk,
-                  label: Text('Masuk'),
-                ),
-                ButtonSegment<_AuthMode>(
-                  value: _AuthMode.daftar,
-                  label: Text('Daftar'),
+              const SizedBox(height: 16),
+              _AuthProviderButton(
+                provider: _SocialProvider.google,
+                onTap: () => _handleSocialAuth(_SocialProvider.google),
+              ),
+              const SizedBox(height: 10),
+              _AuthProviderButton(
+                provider: _SocialProvider.email,
+                onTap: () => _handleSocialAuth(_SocialProvider.email),
+              ),
+              const SizedBox(height: 10),
+              _AuthProviderButton(
+                provider: _SocialProvider.facebook,
+                onTap: () => _handleSocialAuth(_SocialProvider.facebook),
+              ),
+              if (widget.onForgotPassword != null) ...[
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: widget.onForgotPassword,
+                  child: const Text('Lupa kata sandi?'),
                 ),
               ],
-              selected: <_AuthMode>{_mode},
-              onSelectionChanged: (value) =>
-                  setState(() => _mode = value.first),
-            ),
-            const SizedBox(height: 20),
-            if (_isRegisterMode) ...[
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nama tampilan'),
-                validator: (value) {
-                  if (_isRegisterMode && (value?.trim().isEmpty ?? true)) {
-                    return 'Nama tampilan wajib diisi';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-                validator: (value) {
-                  final username = value?.trim() ?? '';
-                  if (_isRegisterMode && username.isEmpty) {
-                    return 'Username wajib diisi';
-                  }
-                  if (username.isNotEmpty && username.length < 4) {
-                    return 'Username minimal 4 karakter';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-            ] else ...[
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama tampilan',
-                  hintText: 'Opsional untuk melengkapi profil',
-                ),
-              ),
-              const SizedBox(height: 12),
             ],
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(labelText: 'Email'),
-              validator: (value) {
-                final email = value?.trim() ?? '';
-                if (email.isEmpty) {
-                  return 'Email wajib diisi';
-                }
-                if (!email.contains('@') || !email.contains('.')) {
-                  return 'Format email belum valid';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: _hidePassword,
-              decoration: InputDecoration(
-                labelText: 'Kata sandi',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _hidePassword ? Icons.visibility_off : Icons.visibility,
-                  ),
-                  onPressed: () => setState(() => _hidePassword = !_hidePassword),
-                ),
-              ),
-              validator: (value) {
-                if ((value ?? '').length < 6) {
-                  return 'Kata sandi minimal 6 karakter';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 18),
-            FilledButton(
-              onPressed: _submit,
-              child: Text(_isRegisterMode ? 'Daftar dengan Email' : 'Masuk dengan Email'),
-            ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: Divider(color: Theme.of(context).dividerColor),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('atau lanjutkan dengan'),
-                ),
-                Expanded(
-                  child: Divider(color: Theme.of(context).dividerColor),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _AuthProviderButton(
-              provider: _SocialProvider.google,
-              onTap: () => _handleSocialAuth(_SocialProvider.google),
-            ),
-            const SizedBox(height: 10),
-            _AuthProviderButton(
-              provider: _SocialProvider.email,
-              onTap: () => _handleSocialAuth(_SocialProvider.email),
-            ),
-            const SizedBox(height: 10),
-            _AuthProviderButton(
-              provider: _SocialProvider.facebook,
-              onTap: () => _handleSocialAuth(_SocialProvider.facebook),
-            ),
-            const SizedBox(height: 10),
-            TextButton(
-              onPressed: widget.onForgotPassword,
-              child: const Text('Lupa kata sandi?'),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Lewati dulu'),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -296,10 +394,7 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class _AuthProviderButton extends StatelessWidget {
-  const _AuthProviderButton({
-    required this.provider,
-    required this.onTap,
-  });
+  const _AuthProviderButton({required this.provider, required this.onTap});
 
   final _SocialProvider provider;
   final VoidCallback onTap;
@@ -310,9 +405,7 @@ class _AuthProviderButton extends StatelessWidget {
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       child: Row(
         children: [
@@ -389,9 +482,9 @@ class _CompleteProfileSheetState extends State<_CompleteProfileSheet> {
               children: [
                 Text(
                   'Lengkapi profil ${widget.provider.label}',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 8),
                 const Text(
