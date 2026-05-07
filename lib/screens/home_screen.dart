@@ -5,6 +5,7 @@ import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
 import '../utils/news_category.dart';
 import '../widgets/news_image.dart';
+import '../widgets/zyn_logo.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -315,15 +316,13 @@ class _TopHeroSection extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'ZYN',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      const ZynLogo(
+                        size: 52,
+                        radius: 16,
+                        showPlate: true,
+                        padding: EdgeInsets.all(4),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 10),
                       Text(
                         greeting,
                         maxLines: 2,

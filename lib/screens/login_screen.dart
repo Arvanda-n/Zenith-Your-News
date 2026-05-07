@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
+import '../widgets/zyn_logo.dart';
 
 enum _AuthMode { masuk, daftar }
 
@@ -185,12 +186,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.white.withValues(alpha: 0.16),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Text(
-                        'Akun ZYN',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ZynLogo(size: 26, radius: 8),
+                          SizedBox(width: 10),
+                          Text(
+                            'Akun ZYN',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
