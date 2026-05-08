@@ -7,7 +7,6 @@ import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
 import '../utils/news_category.dart';
 import '../widgets/news_image.dart';
-import '../widgets/zyn_logo.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -79,10 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final textScale = MediaQuery.textScalerOf(context).scale(1.0).clamp(
-      1.0,
-      1.4,
-    );
+    final textScale = MediaQuery.textScalerOf(
+      context,
+    ).scale(1.0).clamp(1.0, 1.4);
     final compactLayout = media.size.width < 380;
     final preferredCategories = widget.controller.preferredCategories;
     final featuredItems = _prioritizeByPreference(
@@ -363,13 +361,6 @@ class _TopHeroSection extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const ZynLogo(
-                        size: 52,
-                        radius: 16,
-                        showPlate: true,
-                        padding: EdgeInsets.all(4),
-                      ),
-                      const SizedBox(height: 10),
                       Text(
                         greeting,
                         maxLines: 2,
@@ -383,45 +374,42 @@ class _TopHeroSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                _HeroActionButton(
-                  icon: Icons.search_rounded,
-                  onTap: onOpenSearch,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _HeroSearchBar(
+                    compactLayout: compactLayout,
+                    onTap: onOpenSearch,
+                  ),
                 ),
                 const SizedBox(width: 8),
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    _HeroActionButton(
-                      icon: Icons.notifications_none_rounded,
-                      onTap: onOpenNotifications,
-                    ),
-                    if (unreadNotificationCount > 0)
-                      Positioned(
-                        right: -4,
-                        top: -4,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            unreadNotificationCount > 9
-                                ? '9+'
-                                : '$unreadNotificationCount',
-                            style: const TextStyle(
-                              color: Color(0xFF0C49B8),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                _HeroActionButton(
+                  icon: Icons.notifications_none_rounded,
+                  onTap: onOpenNotifications,
+                ),
+                if (unreadNotificationCount > 0)
+                  Transform.translate(
+                    offset: const Offset(-16, -14),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        unreadNotificationCount > 9
+                            ? '9+'
+                            : '$unreadNotificationCount',
+                        style: const TextStyle(
+                          color: Color(0xFF0C49B8),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 8),
@@ -511,6 +499,50 @@ class _HeroActionButton extends StatelessWidget {
       child: IconButton(
         onPressed: onTap,
         icon: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+}
+
+class _HeroSearchBar extends StatelessWidget {
+  const _HeroSearchBar({required this.compactLayout, required this.onTap});
+
+  final bool compactLayout;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Ink(
+          height: 44,
+          padding: EdgeInsets.symmetric(horizontal: compactLayout ? 12 : 14),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.search_rounded, color: Colors.white, size: 19),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Cari berita, topik, atau penulis',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.86),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -800,7 +832,7 @@ class _CuratedCard extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -814,20 +846,23 @@ class _CuratedCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 7),
-                      Text(
-                        item.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          height: 1.2,
+                      Expanded(
+                        child: Text(
+                          item.title,
+                          maxLines: compactLayout ? 2 : 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            height: 1.2,
+                          ),
                         ),
                       ),
-                      const Spacer(),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       Text(
                         '${item.author} | ${item.readMinutes} menit baca',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,
                           fontWeight: FontWeight.w600,
