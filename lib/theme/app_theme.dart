@@ -16,7 +16,7 @@ class AppTheme {
   static const LinearGradient brandGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primary, secondary],
+    colors: [Color(0xFF0F5EEA), Color(0xFF2EC5FF)],
   );
 
   static ThemeData get lightTheme {

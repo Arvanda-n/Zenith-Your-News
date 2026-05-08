@@ -498,39 +498,36 @@ class _SocialAuthButton extends StatelessWidget {
 class _GoogleBadge extends StatelessWidget {
   const _GoogleBadge();
 
+  static const _faviconUrl = 'https://www.google.com/favicon.ico';
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 28,
-      height: 28,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.black12),
-      ),
-      child: ShaderMask(
-        shaderCallback: (bounds) {
-          return const LinearGradient(
-            colors: [
-              Color(0xFF4285F4),
-              Color(0xFF34A853),
-              Color(0xFFFBBC05),
-              Color(0xFFEA4335),
-            ],
-            stops: [0.15, 0.45, 0.72, 1],
-          ).createShader(bounds);
+    return ClipOval(
+      child: Image.network(
+        _faviconUrl,
+        width: 28,
+        height: 28,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black12),
+            ),
+            child: const Text(
+              'G',
+              style: TextStyle(
+                color: Color(0xFF4285F4),
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          );
         },
-        child: const Text(
-          'G',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -1.0,
-          ),
-        ),
       ),
     );
   }
@@ -539,23 +536,35 @@ class _GoogleBadge extends StatelessWidget {
 class _FacebookBadge extends StatelessWidget {
   const _FacebookBadge();
 
+  static const _faviconUrl = 'https://www.facebook.com/favicon.ico';
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 28,
-      height: 28,
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: Color(0xFF1877F2),
-        shape: BoxShape.circle,
-      ),
-      child: const Text(
-        'f',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w800,
-          fontSize: 18,
-        ),
+    return ClipOval(
+      child: Image.network(
+        _faviconUrl,
+        width: 28,
+        height: 28,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Color(0xFF1877F2),
+              shape: BoxShape.circle,
+            ),
+            child: const Text(
+              'f',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -301,7 +301,7 @@ class _TopHeroSection extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF1D4ED8), Color(0xFF4F46E5), Color(0xFF7C3AED)],
+          colors: [Color(0xFF0E4FD6), Color(0xFF116FEF), Color(0xFF2EC5FF)],
         ),
         borderRadius: BorderRadius.circular(32),
       ),

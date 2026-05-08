@@ -218,11 +218,11 @@ class _RootShellState extends State<RootShell> {
                 border: Border.all(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.08)
-                      : const Color(0xFF4F46E5).withValues(alpha: 0.08),
+                      : const Color(0xFF0F5EEA).withValues(alpha: 0.08),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (isDark ? Colors.black : const Color(0xFF4F46E5))
+                    color: (isDark ? Colors.black : const Color(0xFF0F5EEA))
                         .withValues(alpha: isDark ? 0.30 : 0.12),
                     blurRadius: 36,
                     offset: const Offset(0, 18),
@@ -230,7 +230,7 @@ class _RootShellState extends State<RootShell> {
                   BoxShadow(
                     color:
                         (isDark
-                                ? const Color(0xFF312E81)
+                                ? const Color(0xFF0E4FD6)
                                 : const Color(0xFF1D4ED8))
                             .withValues(alpha: isDark ? 0.22 : 0.08),
                     blurRadius: 14,
@@ -244,28 +244,27 @@ class _RootShellState extends State<RootShell> {
                   vertical: 10,
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(items.length, (index) {
                     final item = items[index];
                     final selected = index == _tabIndex;
-                    return Expanded(
-                      child: _BottomNavItem(
-                        label: item.label,
-                        icon: item.icon,
-                        selectedIcon: item.selectedIcon,
-                        selected: selected,
-                        isDark: isDark,
-                        onTap: () {
-                          if (_tabIndex == index) {
-                            return;
-                          }
-                          setState(() => _tabIndex = index);
-                          _pageController.animateToPage(
-                            index,
-                            duration: const Duration(milliseconds: 360),
-                            curve: Curves.easeOutCubic,
-                          );
-                        },
-                      ),
+                    return _BottomNavItem(
+                      label: item.label,
+                      icon: item.icon,
+                      selectedIcon: item.selectedIcon,
+                      selected: selected,
+                      isDark: isDark,
+                      onTap: () {
+                        if (_tabIndex == index) {
+                          return;
+                        }
+                        setState(() => _tabIndex = index);
+                        _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 360),
+                          curve: Curves.easeOutCubic,
+                        );
+                      },
                     );
                   }),
                 ),
@@ -297,8 +296,13 @@ class _BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inactiveColor = isDark ? Colors.white70 : const Color(0xFF8C7AAE);
-    final activeForeground = isDark ? Colors.white : const Color(0xFF3F2D7A);
+    final inactiveColor = isDark ? Colors.white70 : const Color(0xFF72809B);
+    final activeForeground = isDark ? Colors.white : const Color(0xFF0E4AA8);
+    final activeWidth = switch (label) {
+      'Beranda' => 106.0,
+      'Simpan' => 102.0,
+      _ => 94.0,
+    };
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -307,77 +311,84 @@ class _BottomNavItem extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(999),
           onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 320),
-            curve: Curves.easeOutCubic,
-            height: 60,
-            padding: EdgeInsets.symmetric(
-              horizontal: selected ? 10 : 0,
-              vertical: 6,
-            ),
-            decoration: BoxDecoration(
-              gradient: selected
-                  ? LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: isDark
-                          ? const [Color(0xFF3B82F6), Color(0xFF7C3AED)]
-                          : const [Color(0xFFE0E7FF), Color(0xFFEDE9FE)],
-                    )
-                  : null,
-              color: selected || !isDark
-                  ? null
-                  : Colors.white.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedSlide(
-                  duration: const Duration(milliseconds: 280),
-                  offset: selected ? Offset.zero : const Offset(0, 0.08),
-                  curve: Curves.easeOutCubic,
-                  child: AnimatedScale(
-                    duration: const Duration(milliseconds: 280),
-                    scale: selected ? 1.08 : 1,
-                    curve: Curves.easeOutBack,
-                    child: Icon(
-                      selected ? selectedIcon : icon,
-                      color: selected ? activeForeground : inactiveColor,
-                      size: selected ? 24 : 23,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final canShowLabel =
+                  selected && constraints.maxWidth >= activeWidth;
+
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOutCubic,
+                height: 60,
+                width: selected ? activeWidth : 56,
+                padding: EdgeInsets.symmetric(
+                  horizontal: canShowLabel ? 14 : 0,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  gradient: selected
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: isDark
+                              ? const [Color(0xFF0F5EEA), Color(0xFF2EC5FF)]
+                              : const [Color(0xFFDCEBFF), Color(0xFFEEF8FF)],
+                        )
+                      : null,
+                  color: selected || !isDark
+                      ? null
+                      : Colors.white.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedSlide(
+                      duration: const Duration(milliseconds: 280),
+                      offset: selected ? Offset.zero : const Offset(0, 0.04),
+                      curve: Curves.easeOutCubic,
+                      child: AnimatedScale(
+                        duration: const Duration(milliseconds: 280),
+                        scale: selected ? 1.08 : 1,
+                        curve: Curves.easeOutBack,
+                        child: Icon(
+                          selected ? selectedIcon : icon,
+                          color: selected ? activeForeground : inactiveColor,
+                          size: selected ? 24 : 23,
+                        ),
+                      ),
                     ),
-                  ),
+                    Flexible(
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 280),
+                        curve: Curves.easeOutCubic,
+                        child: canShowLabel
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      label,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: activeForeground,
+                                        fontSize: 11.6,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 240),
-                  curve: Curves.easeOutCubic,
-                  style: TextStyle(
-                    color: selected ? activeForeground : inactiveColor,
-                    fontSize: selected ? 11.8 : 11.2,
-                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                  ),
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 260),
-                  curve: Curves.easeOutCubic,
-                  margin: const EdgeInsets.only(top: 4),
-                  width: selected ? 18 : 0,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? (isDark ? Colors.white : const Color(0xFF1B5FFF))
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),

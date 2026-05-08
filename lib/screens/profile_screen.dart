@@ -25,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
 
         return Scaffold(
           body: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 132),
             children: [
               const SafeArea(bottom: false, child: SizedBox.shrink()),
               Container(
@@ -202,18 +202,21 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 18),
-              FilledButton(
-                onPressed: () {
-                  if (isLoggedIn) {
-                    controller.logout();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Berhasil keluar.')),
-                    );
-                    return;
-                  }
-                  onOpenLogin();
-                },
-                child: Text(isLoggedIn ? 'Keluar' : 'Masuk / Daftar'),
+              SafeArea(
+                top: false,
+                child: FilledButton(
+                  onPressed: () {
+                    if (isLoggedIn) {
+                      controller.logout();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Berhasil keluar.')),
+                      );
+                      return;
+                    }
+                    onOpenLogin();
+                  },
+                  child: Text(isLoggedIn ? 'Keluar' : 'Masuk / Daftar'),
+                ),
               ),
             ],
           ),
