@@ -280,7 +280,7 @@ class _OnboardingPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(height: topGap),
-                    _HeroOrb(item: item, size: imageSize),
+                    _HeroVisual(item: item, size: imageSize),
                     SizedBox(height: titleGap),
                     Text(
                       item.title,
@@ -317,119 +317,149 @@ class _OnboardingPage extends StatelessWidget {
   }
 }
 
-class _HeroOrb extends StatelessWidget {
-  const _HeroOrb({required this.item, required this.size});
+class _HeroVisual extends StatelessWidget {
+  const _HeroVisual({required this.item, required this.size});
 
   final _OnboardingItem item;
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final panelHeight = size * 1.14;
+
     return SizedBox(
       width: size,
-      height: size,
+      height: panelHeight,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
+                borderRadius: BorderRadius.circular(34),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: <Color>[
-                    AppTheme.secondary.withValues(alpha: 0.24),
-                    AppTheme.primary.withValues(alpha: 0.08),
-                    AppTheme.primary.withValues(alpha: 0.03),
+                    AppTheme.primary.withValues(alpha: 0.18),
+                    AppTheme.secondary.withValues(alpha: 0.08),
                   ],
                 ),
               ),
             ),
           ),
           Positioned(
-            top: 22,
-            left: 22,
-            right: 22,
-            bottom: 22,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.52),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.10),
-                    blurRadius: 28,
-                    offset: const Offset(0, 16),
+            top: 18,
+            left: 18,
+            right: 18,
+            bottom: 18,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  NewsImage(
+                    imageUrl: item.imageUrl,
+                    imageHint: item.imageHint,
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: ClipOval(
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      NewsImage(
-                        imageUrl: item.imageUrl,
-                        imageHint: item.imageHint,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: const <double>[0.0, 0.26, 0.62, 1.0],
+                        colors: <Color>[
+                          const Color(0xFF0F5EEA),
+                          const Color(0xFF0F5EEA),
+                          AppTheme.primary.withValues(alpha: 0.44),
+                          AppTheme.primary.withValues(alpha: 0.08),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 18,
+                    left: 18,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.16),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: <Color>[
-                              Colors.white.withValues(alpha: 0.02),
-                              Colors.black.withValues(alpha: 0.28),
-                            ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(item.icon, color: Colors.white, size: 16),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Daily Brief',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 18,
+                    right: 18,
+                    bottom: 18,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.18),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: size * 0.33,
-            left: size * 0.33,
-            child: Container(
-              width: 84,
-              height: 84,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.86),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.14),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                      child: Text(
+                        item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: Icon(item.icon, color: AppTheme.primary, size: 40),
             ),
           ),
           Positioned(
-            top: 34,
-            left: -8,
-            child: _Sparkle(color: AppTheme.primary.withValues(alpha: 0.32)),
-          ),
-          Positioned(
-            bottom: 24,
-            right: -2,
+            top: panelHeight * 0.42,
+            right: -4,
             child: Container(
-              width: 46,
-              height: 46,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: AppTheme.primary.withValues(alpha: 0.22),
-                  width: 1.5,
+                  color: AppTheme.primary.withValues(alpha: 0.18),
+                  width: 1.4,
                 ),
               ),
             ),
+          ),
+          Positioned(
+            top: 22,
+            left: -6,
+            child: _Sparkle(color: AppTheme.primary.withValues(alpha: 0.28)),
+          ),
+          Positioned(
+            bottom: 34,
+            left: -8,
+            child: _Sparkle(color: AppTheme.secondary.withValues(alpha: 0.24)),
           ),
         ],
       ),
