@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/dummy_news.dart';
 import '../theme/app_theme.dart';
 import '../widgets/news_image.dart';
+import '../widgets/zyn_logo.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, required this.onComplete});
@@ -76,38 +77,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 8),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 9,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(999),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.newspaper_rounded,
-                          color: AppTheme.primary,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'ZYN News',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: const Color(0xFF0F172A),
-                          ),
-                        ),
-                      ],
+                  const ZynLogo(
+                    size: 48,
+                    radius: 16,
+                    showPlate: true,
+                    padding: EdgeInsets.all(4),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'ZYN News',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF0F172A),
                     ),
                   ),
                   const Spacer(),

@@ -77,6 +77,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0).clamp(
+      1.0,
+      1.4,
+    );
     final compactLayout = media.size.width < 380;
     final preferredCategories = widget.controller.preferredCategories;
     final featuredItems = _prioritizeByPreference(
@@ -118,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     headlineController: _headlineController,
                     headlineIndex: _headlineIndex,
                     compactLayout: compactLayout,
+                    textScale: textScale,
                     unreadNotificationCount:
                         widget.controller.notificationsEnabled
                         ? widget.controller.unreadNotificationCount
@@ -160,16 +165,16 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
-                child: _SectionHeader(
-                  title: 'Headline Utama',
-                ),
+                child: _SectionHeader(title: 'Headline Utama'),
               ),
             ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: SizedBox(
-                  height: compactLayout ? 236 : 254,
+                  height: compactLayout
+                      ? 236 + ((textScale - 1) * 54)
+                      : 254 + ((textScale - 1) * 48),
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: curatedItems.length,
@@ -218,9 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
-                child: _SectionHeader(
-                  title: 'Berita Terbaru',
-                ),
+                child: _SectionHeader(title: 'Berita Terbaru'),
               ),
             ),
             SliverPadding(
@@ -304,6 +307,7 @@ class _TopHeroSection extends StatelessWidget {
     required this.headlineController,
     required this.headlineIndex,
     required this.compactLayout,
+    required this.textScale,
     required this.unreadNotificationCount,
     required this.onOpenSearch,
     required this.onOpenNotifications,
@@ -317,6 +321,7 @@ class _TopHeroSection extends StatelessWidget {
   final PageController headlineController;
   final int headlineIndex;
   final bool compactLayout;
+  final double textScale;
   final int unreadNotificationCount;
   final VoidCallback onOpenSearch;
   final VoidCallback onOpenNotifications;
@@ -431,7 +436,9 @@ class _TopHeroSection extends StatelessWidget {
             const SizedBox(height: 14),
             if (featuredItems.isNotEmpty) ...[
               SizedBox(
-                height: compactLayout ? 246 : 270,
+                height: compactLayout
+                    ? 246 + ((textScale - 1) * 52)
+                    : 270 + ((textScale - 1) * 44),
                 child: PageView.builder(
                   controller: headlineController,
                   itemCount: featuredItems.length,
@@ -584,7 +591,7 @@ class _HeadlineCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    '${item.author} • ${item.readMinutes} menit baca',
+                    '${item.author} | ${item.readMinutes} menit baca',
                     style: const TextStyle(
                       color: Colors.white70,
                       fontWeight: FontWeight.w600,
@@ -669,11 +676,7 @@ class _QuickActionCard extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    this.actionLabel,
-    this.onAction,
-  });
+  const _SectionHeader({required this.title, this.actionLabel, this.onAction});
 
   final String title;
   final String? actionLabel;

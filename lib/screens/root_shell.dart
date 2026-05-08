@@ -300,6 +300,10 @@ class _BottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final inactiveColor = isDark ? Colors.white70 : const Color(0xFF72809B);
     final activeForeground = isDark ? Colors.white : const Color(0xFF0E4AA8);
+    final labelScale = MediaQuery.textScalerOf(context).scale(1.0).clamp(
+      1.0,
+      1.12,
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -311,7 +315,7 @@ class _BottomNavItem extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 320),
             curve: Curves.easeOutCubic,
-            height: 62,
+            height: 64,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             decoration: BoxDecoration(
               gradient: selected
@@ -343,17 +347,22 @@ class _BottomNavItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 220),
-                  style: TextStyle(
-                    color: selected ? activeForeground : inactiveColor,
-                    fontSize: 11.6,
-                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                  ),
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                MediaQuery(
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(textScaler: TextScaler.linear(labelScale)),
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 220),
+                    style: TextStyle(
+                      color: selected ? activeForeground : inactiveColor,
+                      fontSize: 11.6,
+                      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                    ),
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 AnimatedContainer(
