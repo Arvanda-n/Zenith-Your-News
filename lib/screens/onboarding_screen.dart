@@ -314,13 +314,13 @@ class _HeroVisual extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: const <double>[0.0, 0.24, 0.48, 0.72, 1.0],
+                stops: const <double>[0.0, 0.20, 0.42, 0.68, 1.0],
                 colors: <Color>[
                   const Color(0xFFF7FAFF),
                   const Color(0xFFF7FAFF).withValues(alpha: 0.96),
-                  const Color(0xFFF7FAFF).withValues(alpha: 0.80),
-                  const Color(0xFFF7FAFF).withValues(alpha: 0.34),
-                  Colors.transparent,
+                  const Color(0xFFF7FAFF).withValues(alpha: 0.74),
+                  const Color(0xFFF7FAFF).withValues(alpha: 0.20),
+                  const Color(0xFFF7FAFF).withValues(alpha: 0.06),
                 ],
               ),
             ),
@@ -332,115 +332,89 @@ class _HeroVisual extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: const <double>[0.0, 0.60, 0.88, 1.0],
+                stops: const <double>[0.0, 0.56, 0.82, 1.0],
                 colors: <Color>[
                   AppTheme.primary.withValues(alpha: 0.04),
                   Colors.transparent,
-                  AppTheme.primary.withValues(alpha: 0.10),
-                  AppTheme.primary.withValues(alpha: 0.18),
+                  AppTheme.primary.withValues(alpha: 0.08),
+                  AppTheme.primary.withValues(alpha: 0.12),
                 ],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: -24,
-          child: IgnorePointer(
-            child: Container(
-              height: 240,
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0.0, -0.55),
-                  radius: 1.0,
-                  colors: <Color>[
-                    AppTheme.primary.withValues(alpha: 0.12),
-                    AppTheme.primary.withValues(alpha: 0.02),
-                    Colors.transparent,
-                  ],
-                ),
               ),
             ),
           ),
         ),
         Positioned(
           right: 24,
+          bottom: 148,
+          child: _AccentBubble(icon: item.icon, angle: -0.14, size: 88),
+        ),
+        Positioned(
+          left: 28,
           bottom: 126,
-          child: Transform.rotate(
-            angle: -0.12,
-            child: Container(
-              width: 110,
-              height: 132,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.90),
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.12),
-                    blurRadius: 24,
-                    offset: const Offset(0, 14),
-                  ),
-                ],
-              ),
-              child: Icon(
-                item.icon,
-                size: 42,
-                color: AppTheme.primary.withValues(alpha: 0.82),
-              ),
-            ),
+          child: _AccentBubble(
+            icon: Icons.auto_awesome_rounded,
+            angle: 0.10,
+            size: 56,
+            filled: false,
           ),
         ),
         Positioned(
-          left: 22,
-          right: 22,
-          bottom: 54,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.86),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 18,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const Icon(
-                    Icons.auto_awesome_mosaic_rounded,
-                    color: AppTheme.primary,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF111827),
-                      height: 1.2,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          left: 92,
+          bottom: 78,
+          child: _AccentBubble(
+            icon: Icons.bolt_rounded,
+            angle: -0.08,
+            size: 48,
+            filled: false,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AccentBubble extends StatelessWidget {
+  const _AccentBubble({
+    required this.icon,
+    required this.angle,
+    required this.size,
+    this.filled = true,
+  });
+
+  final IconData icon;
+  final double angle;
+  final double size;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: angle,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: filled
+              ? Colors.white.withValues(alpha: 0.88)
+              : AppTheme.primary.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(size * 0.32),
+          border: Border.all(
+            color: AppTheme.primary.withValues(alpha: filled ? 0.08 : 0.16),
+          ),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: AppTheme.primary.withValues(alpha: 0.10),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          size: size * 0.36,
+          color: AppTheme.primary.withValues(alpha: 0.84),
+        ),
+      ),
     );
   }
 }
