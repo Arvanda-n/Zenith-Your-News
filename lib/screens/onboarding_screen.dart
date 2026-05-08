@@ -332,39 +332,39 @@ class _HeroVisual extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: const <double>[0.0, 0.56, 0.82, 1.0],
+                stops: const <double>[0.0, 0.56, 0.86, 1.0],
                 colors: <Color>[
                   AppTheme.primary.withValues(alpha: 0.04),
                   Colors.transparent,
+                  AppTheme.primary.withValues(alpha: 0.05),
                   AppTheme.primary.withValues(alpha: 0.08),
-                  AppTheme.primary.withValues(alpha: 0.12),
                 ],
               ),
             ),
           ),
         ),
         Positioned(
-          right: 24,
-          bottom: 148,
+          left: 24,
+          top: 36,
           child: _AccentBubble(icon: item.icon, angle: -0.14, size: 88),
         ),
         Positioned(
-          left: 28,
-          bottom: 126,
+          right: 26,
+          top: 44,
           child: _AccentBubble(
             icon: Icons.auto_awesome_rounded,
-            angle: 0.10,
-            size: 56,
+            angle: 0.14,
+            size: 52,
             filled: false,
           ),
         ),
         Positioned(
-          left: 92,
-          bottom: 78,
+          right: 82,
+          top: 122,
           child: _AccentBubble(
             icon: Icons.bolt_rounded,
             angle: -0.08,
-            size: 48,
+            size: 42,
             filled: false,
           ),
         ),
@@ -395,8 +395,8 @@ class _AccentBubble extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: filled
-              ? Colors.white.withValues(alpha: 0.88)
-              : AppTheme.primary.withValues(alpha: 0.10),
+              ? Colors.white.withValues(alpha: 0.86)
+              : AppTheme.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(size * 0.32),
           border: Border.all(
             color: AppTheme.primary.withValues(alpha: filled ? 0.08 : 0.16),
