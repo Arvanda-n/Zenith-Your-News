@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../data/dummy_news.dart';
 import '../theme/app_theme.dart';
 import '../widgets/news_image.dart';
-import '../widgets/zyn_logo.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, required this.onComplete});
@@ -22,26 +21,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingItem(
       title: 'Selamat Datang di ZYN',
       description:
-          'Nikmati pengalaman membaca yang terasa premium, cepat, dan nyaman seperti aplikasi berita modern favoritmu.',
+          'Nikmati pengalaman membaca berita yang lebih elegan, ringan, dan nyaman untuk ritme harianmu.',
       imageUrl: dummyNews[0].imageUrl,
       imageHint: dummyNews[0].imageHint,
-      accentLabel: 'Mobile-first news',
+      icon: Icons.waving_hand_rounded,
     ),
     _OnboardingItem(
       title: 'Dapatkan Berita Real-Time',
       description:
-          'Headline penting, ringkasan tajam, dan visual yang rapi disusun untuk ritme baca harian yang serba cepat.',
+          'Headline penting, pembaruan cepat, dan visual premium hadir dalam satu aplikasi mobile-first.',
       imageUrl: dummyNews[10].imageUrl,
       imageHint: dummyNews[10].imageHint,
-      accentLabel: 'Update sepanjang hari',
+      icon: Icons.bolt_rounded,
     ),
     _OnboardingItem(
       title: 'Ikuti Trending News Setiap Hari',
       description:
-          'Pantau topik paling ramai dan nikmati tampilan yang terasa dekat dengan aplikasi berita profesional di Play Store.',
+          'Pantau topik yang sedang ramai dan mulai hari dengan feed berita yang terasa lebih relevan.',
       imageUrl: dummyNews[25].imageUrl,
       imageHint: dummyNews[25].imageHint,
-      accentLabel: 'Trending setiap hari',
+      icon: Icons.local_fire_department_rounded,
     ),
   ];
 
@@ -67,201 +66,312 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final media = MediaQuery.of(context);
-    final wideLayout = media.size.width >= 420;
-    final heroHeight = wideLayout ? 420.0 : 360.0;
+    final topPadding = media.padding.top + 12;
 
     return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: <Color>[
-              AppTheme.primary.withValues(alpha: 0.18),
-              Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-            children: [
-              Row(
-                children: [
-                  const ZynLogo(size: 44, radius: 14, showPlate: true),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Mulai dengan ZYN',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: widget.onComplete,
-                    child: const Text('Lewati'),
-                  ),
+      body: Stack(
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: <Color>[
+                  const Color(0xFFF7FAFF),
+                  AppTheme.primary.withValues(alpha: 0.04),
+                  theme.scaffoldBackgroundColor,
                 ],
               ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: heroHeight,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _items.length,
-                  onPageChanged: (value) => setState(() => _pageIndex = value),
-                  itemBuilder: (context, index) {
-                    return _OnboardingHero(
-                      item: _items[index],
-                      isActive: index == _pageIndex,
-                    );
-                  },
+            ),
+            child: Stack(
+              children: [
+                const _FloatingGlow(
+                  top: -26,
+                  left: -48,
+                  size: 170,
+                  opacity: 0.10,
                 ),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_items.length, (index) {
-                  final active = index == _pageIndex;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: active ? 26 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      gradient: active ? AppTheme.brandGradient : null,
-                      color: active
-                          ? null
-                          : Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.16),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 22),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
+                const _FloatingGlow(
+                  top: 140,
+                  right: -40,
+                  size: 120,
+                  opacity: 0.12,
+                ),
+                const _FloatingGlow(
+                  bottom: 90,
+                  left: -26,
+                  size: 94,
+                  opacity: 0.12,
+                ),
+                const _FloatingGlow(
+                  bottom: 30,
+                  right: -18,
+                  size: 100,
+                  opacity: 0.10,
+                ),
+                Positioned(
+                  left: 48,
+                  top: 110,
+                  child: _Sparkle(
+                    color: AppTheme.primary.withValues(alpha: 0.36),
+                  ),
+                ),
+                Positioned(
+                  right: 72,
+                  top: 208,
+                  child: _Sparkle(
+                    color: AppTheme.secondary.withValues(alpha: 0.30),
+                  ),
+                ),
+                Positioned(
+                  left: 32,
+                  bottom: 146,
+                  child: _Sparkle(
+                    color: AppTheme.primary.withValues(alpha: 0.22),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: topPadding,
+            left: 20,
+            right: 20,
+            child: Row(
+              children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.10),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.auto_stories_rounded,
+                    color: AppTheme.primary,
+                    size: 18,
+                  ),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: widget.onComplete,
+                  icon: const Icon(Icons.skip_next_rounded),
+                  label: const Text('Lewati'),
+                ),
+              ],
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _items.length,
+                    onPageChanged: (value) =>
+                        setState(() => _pageIndex = value),
+                    itemBuilder: (context, index) {
+                      return _OnboardingPage(
+                        item: _items[index],
+                        isActive: index == _pageIndex,
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 26),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _items[_pageIndex].title,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _items[_pageIndex].description,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(height: 1.5),
-                      ),
-                      const SizedBox(height: 20),
                       Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: _pageIndex == 0
-                                  ? null
-                                  : () {
-                                      _pageController.previousPage(
-                                        duration: const Duration(
-                                          milliseconds: 320,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(_items.length, (index) {
+                          final active = index == _pageIndex;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            width: active ? 26 : 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: active
+                                  ? AppTheme.primary
+                                  : Colors.black.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(999),
+                              boxShadow: active
+                                  ? <BoxShadow>[
+                                      BoxShadow(
+                                        color: AppTheme.primary.withValues(
+                                          alpha: 0.18,
                                         ),
-                                        curve: Curves.easeOutCubic,
-                                      );
-                                    },
-                              child: const Text('Sebelumnya'),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 18),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _goNext,
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size.fromHeight(64),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            elevation: 8,
+                            shadowColor: AppTheme.primary.withValues(
+                              alpha: 0.24,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: _goNext,
-                              child: Text(
-                                _isLastPage ? 'Mulai Sekarang' : 'Selanjutnya',
-                              ),
+                          child: Text(
+                            _isLastPage ? 'Mulai Sekarang' : 'Selanjutnya',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-class _OnboardingHero extends StatelessWidget {
-  const _OnboardingHero({required this.item, required this.isActive});
+class _OnboardingPage extends StatelessWidget {
+  const _OnboardingPage({required this.item, required this.isActive});
 
   final _OnboardingItem item;
   final bool isActive;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedScale(
+    return AnimatedOpacity(
       duration: const Duration(milliseconds: 260),
-      scale: isActive ? 1 : 0.98,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 2),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: <Color>[
-              Color(0xFF0F5EEA),
-              Color(0xFF1798FF),
-              Color(0xFF2EC5FF),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(32),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  item.accentLabel,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
+      opacity: isActive ? 1 : 0.82,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final imageSize = _resolveHeroSize(
+            width: constraints.maxWidth,
+            height: constraints.maxHeight,
+          );
+          final topGap = constraints.maxHeight < 520 ? 16.0 : 30.0;
+          final titleGap = constraints.maxHeight < 520 ? 22.0 : 40.0;
+
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(24, 88, 24, 12),
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: topGap),
+                    _HeroOrb(item: item, size: imageSize),
+                    SizedBox(height: titleGap),
+                    Text(
+                      item.title,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.w800, height: 1.1),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      item.description,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.58),
+                        height: 1.55,
+                      ),
+                    ),
+                    SizedBox(height: constraints.maxHeight < 520 ? 14 : 28),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(26),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  double _resolveHeroSize({required double width, required double height}) {
+    final byWidth = width >= 420 ? 320.0 : 272.0;
+    final byHeight = height < 430 ? height * 0.46 : height * 0.54;
+    return byHeight.clamp(176.0, byWidth);
+  }
+}
+
+class _HeroOrb extends StatelessWidget {
+  const _HeroOrb({required this.item, required this.size});
+
+  final _OnboardingItem item;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: <Color>[
+                    AppTheme.secondary.withValues(alpha: 0.24),
+                    AppTheme.primary.withValues(alpha: 0.08),
+                    AppTheme.primary.withValues(alpha: 0.03),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 22,
+            left: 22,
+            right: 22,
+            bottom: 22,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.52),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.10),
+                    blurRadius: 28,
+                    offset: const Offset(0, 16),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: ClipOval(
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
                       NewsImage(
                         imageUrl: item.imageUrl,
                         imageHint: item.imageHint,
-                        borderRadius: BorderRadius.circular(26),
+                        borderRadius: BorderRadius.circular(999),
                       ),
                       DecoratedBox(
                         decoration: BoxDecoration(
@@ -269,46 +379,125 @@ class _OnboardingHero extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: <Color>[
-                              Colors.black.withValues(alpha: 0.02),
-                              Colors.black.withValues(alpha: 0.60),
+                              Colors.white.withValues(alpha: 0.02),
+                              Colors.black.withValues(alpha: 0.28),
                             ],
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Spacer(),
-                            Text(
-                              item.title,
-                              style: Theme.of(context).textTheme.headlineSmall
-                                  ?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    height: 1.15,
-                                  ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              item.description,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 15,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ],
+            ),
           ),
+          Positioned(
+            top: size * 0.33,
+            left: size * 0.33,
+            child: Container(
+              width: 84,
+              height: 84,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.86),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.14),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Icon(item.icon, color: AppTheme.primary, size: 40),
+            ),
+          ),
+          Positioned(
+            top: 34,
+            left: -8,
+            child: _Sparkle(color: AppTheme.primary.withValues(alpha: 0.32)),
+          ),
+          Positioned(
+            bottom: 24,
+            right: -2,
+            child: Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.primary.withValues(alpha: 0.22),
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FloatingGlow extends StatelessWidget {
+  const _FloatingGlow({
+    this.top,
+    this.left,
+    this.right,
+    this.bottom,
+    required this.size,
+    required this.opacity,
+  });
+
+  final double? top;
+  final double? left;
+  final double? right;
+  final double? bottom;
+  final double size;
+  final double opacity;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: top,
+      left: left,
+      right: right,
+      bottom: bottom,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppTheme.primary.withValues(alpha: opacity),
         ),
+      ),
+    );
+  }
+}
+
+class _Sparkle extends StatelessWidget {
+  const _Sparkle({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 28,
+      height: 28,
+      child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: Icon(Icons.star_rounded, size: 14, color: color),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Icon(Icons.star_rounded, size: 10, color: color),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Icon(Icons.star_rounded, size: 8, color: color),
+          ),
+        ],
       ),
     );
   }
@@ -320,12 +509,12 @@ class _OnboardingItem {
     required this.description,
     required this.imageUrl,
     required this.imageHint,
-    required this.accentLabel,
+    required this.icon,
   });
 
   final String title;
   final String description;
   final String imageUrl;
   final String imageHint;
-  final String accentLabel;
+  final IconData icon;
 }

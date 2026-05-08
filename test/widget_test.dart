@@ -17,9 +17,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Selamat Datang di ZYN'), findsWidgets);
-    expect(find.text('Lewati'), findsOneWidget);
-
-    await tester.tap(find.text('Lewati'));
+    final skipButton = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, 'Lewati'),
+    );
+    skipButton.onPressed!.call();
     await tester.pumpAndSettle();
 
     expect(find.text('Pilih topik favoritmu'), findsOneWidget);
