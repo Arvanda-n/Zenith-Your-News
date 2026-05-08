@@ -388,40 +388,51 @@ class _TopHeroSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                _HeroActionButton(
-                  icon: Icons.search_rounded,
-                  onTap: onOpenSearch,
-                ),
-                const SizedBox(width: 8),
-                _HeroActionButton(
-                  icon: Icons.notifications_none_rounded,
-                  onTap: onOpenNotifications,
-                ),
-                if (unreadNotificationCount > 0)
-                  Transform.translate(
-                    offset: const Offset(-16, -14),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        unreadNotificationCount > 9
-                            ? '9+'
-                            : '$unreadNotificationCount',
-                        style: const TextStyle(
-                          color: Color(0xFF0C49B8),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                const SizedBox(width: 10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _HeroActionButton(
+                      icon: Icons.search_rounded,
+                      onTap: onOpenSearch,
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        _HeroActionButton(
+                          icon: Icons.notifications_none_rounded,
+                          onTap: onOpenNotifications,
+                        ),
+                        if (unreadNotificationCount > 0)
+                          Positioned(
+                            right: -4,
+                            top: -5,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                unreadNotificationCount > 9
+                                    ? '9+'
+                                    : '$unreadNotificationCount',
+                                style: const TextStyle(
+                                  color: Color(0xFF0C49B8),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -491,15 +502,16 @@ class _HeroActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 48,
-      height: 48,
+      width: 46,
+      height: 46,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.70),
-        borderRadius: BorderRadius.circular(18),
+        color: Colors.white.withValues(alpha: 0.34),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: IconButton(
         onPressed: onTap,
-        icon: Icon(icon, color: const Color(0xFF111827), size: 24),
+        icon: Icon(icon, color: Colors.white, size: 22),
       ),
     );
   }
@@ -538,9 +550,13 @@ class _HeadlineCard extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
+                  stops: const <double>[0.0, 0.28, 0.58, 0.80, 1.0],
                   colors: <Color>[
-                    Colors.black.withValues(alpha: 0.06),
-                    Colors.black.withValues(alpha: 0.68),
+                    Colors.black.withValues(alpha: 0.10),
+                    Colors.black.withValues(alpha: 0.30),
+                    Colors.black.withValues(alpha: 0.58),
+                    Colors.black.withValues(alpha: 0.18),
+                    Colors.transparent,
                   ],
                 ),
               ),
