@@ -368,9 +368,9 @@ class _TopHeroSection extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: 19,
                           fontWeight: FontWeight.w900,
-                          height: 1.25,
+                          height: 1.18,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -380,9 +380,9 @@ class _TopHeroSection extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 13,
+                          fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          height: 1.35,
+                          height: 1.32,
                         ),
                       ),
                     ],
@@ -593,7 +593,8 @@ class _HeadlineCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
-                      height: 1.12,
+                      fontSize: compactLayout ? 21 : 22,
+                      height: 1.08,
                     ),
                   ),
                   const SizedBox(height: 10),
