@@ -27,13 +27,14 @@ class RootShell extends StatefulWidget {
 }
 
 class _RootShellState extends State<RootShell> {
-  int _tabIndex = 0;
+  late int _tabIndex;
   late final PageController _pageController;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    _tabIndex = widget.controller.lastSelectedTab;
+    _pageController = PageController(initialPage: _tabIndex);
   }
 
   @override
@@ -140,6 +141,20 @@ class _RootShellState extends State<RootShell> {
     );
   }
 
+  void _selectTab(int index) {
+    if (_tabIndex == index) {
+      return;
+    }
+
+    setState(() => _tabIndex = index);
+    widget.controller.setLastSelectedTab(index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 360),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -203,7 +218,12 @@ class _RootShellState extends State<RootShell> {
           body: PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
-            onPageChanged: (value) => setState(() => _tabIndex = value),
+            onPageChanged: (value) {
+              if (_tabIndex != value) {
+                setState(() => _tabIndex = value);
+              }
+              widget.controller.setLastSelectedTab(value);
+            },
             children: pages,
           ),
           bottomNavigationBar: SafeArea(
@@ -244,27 +264,18 @@ class _RootShellState extends State<RootShell> {
                   vertical: 10,
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(items.length, (index) {
                     final item = items[index];
                     final selected = index == _tabIndex;
-                    return _BottomNavItem(
-                      label: item.label,
-                      icon: item.icon,
-                      selectedIcon: item.selectedIcon,
-                      selected: selected,
-                      isDark: isDark,
-                      onTap: () {
-                        if (_tabIndex == index) {
-                          return;
-                        }
-                        setState(() => _tabIndex = index);
-                        _pageController.animateToPage(
-                          index,
-                          duration: const Duration(milliseconds: 360),
-                          curve: Curves.easeOutCubic,
-                        );
-                      },
+                    return Expanded(
+                      child: _BottomNavItem(
+                        label: item.label,
+                        icon: item.icon,
+                        selectedIcon: item.selectedIcon,
+                        selected: selected,
+                        isDark: isDark,
+                        onTap: () => _selectTab(index),
+                      ),
                     );
                   }),
                 ),
@@ -313,14 +324,18 @@ class _BottomNavItem extends StatelessWidget {
           onTap: onTap,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final canShowLabel =
-                  selected && constraints.maxWidth >= activeWidth;
+              final targetWidth = selected ? activeWidth : 56.0;
+              final resolvedWidth = targetWidth.clamp(
+                56.0,
+                constraints.maxWidth,
+              );
+              final canShowLabel = selected && resolvedWidth >= activeWidth - 2;
 
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 320),
                 curve: Curves.easeOutCubic,
                 height: 60,
-                width: selected ? activeWidth : 56,
+                width: resolvedWidth,
                 padding: EdgeInsets.symmetric(
                   horizontal: canShowLabel ? 14 : 0,
                   vertical: 6,
@@ -340,52 +355,40 @@ class _BottomNavItem extends StatelessWidget {
                       : Colors.white.withValues(alpha: 0.03),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedSlide(
-                      duration: const Duration(milliseconds: 280),
-                      offset: selected ? Offset.zero : const Offset(0, 0.04),
-                      curve: Curves.easeOutCubic,
-                      child: AnimatedScale(
+                child: ClipRect(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedSlide(
                         duration: const Duration(milliseconds: 280),
-                        scale: selected ? 1.08 : 1,
-                        curve: Curves.easeOutBack,
-                        child: Icon(
-                          selected ? selectedIcon : icon,
-                          color: selected ? activeForeground : inactiveColor,
-                          size: selected ? 24 : 23,
+                        offset: selected ? Offset.zero : const Offset(0, 0.04),
+                        curve: Curves.easeOutCubic,
+                        child: AnimatedScale(
+                          duration: const Duration(milliseconds: 280),
+                          scale: selected ? 1.08 : 1,
+                          curve: Curves.easeOutBack,
+                          child: Icon(
+                            selected ? selectedIcon : icon,
+                            color: selected ? activeForeground : inactiveColor,
+                            size: selected ? 24 : 23,
+                          ),
                         ),
                       ),
-                    ),
-                    Flexible(
-                      child: AnimatedSize(
-                        duration: const Duration(milliseconds: 280),
-                        curve: Curves.easeOutCubic,
-                        child: canShowLabel
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const SizedBox(width: 10),
-                                  Flexible(
-                                    child: Text(
-                                      label,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: activeForeground,
-                                        fontSize: 11.6,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ),
-                  ],
+                      if (canShowLabel) ...[
+                        const SizedBox(width: 10),
+                        Text(
+                          label,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: activeForeground,
+                            fontSize: 11.6,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               );
             },

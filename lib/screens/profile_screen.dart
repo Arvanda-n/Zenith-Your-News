@@ -25,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
 
         return Scaffold(
           body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 132),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 112),
             children: [
               const SafeArea(bottom: false, child: SizedBox.shrink()),
               Container(

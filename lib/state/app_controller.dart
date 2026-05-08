@@ -31,6 +31,7 @@ class AppController extends ChangeNotifier {
   static const _userNameKey = 'user_name';
   static const _userHandleKey = 'user_handle';
   static const _userEmailKey = 'user_email';
+  static const _lastSelectedTabKey = 'last_selected_tab';
   static const _bookmarksKey = 'bookmarks';
   static const _preferredCategoriesKey = 'preferred_categories';
   static const _notificationsKey = 'notifications';
@@ -43,6 +44,7 @@ class AppController extends ChangeNotifier {
   bool _isReady = false;
   bool _hasCompletedOnboarding = false;
   bool _hasCompletedAuthGate = false;
+  int _lastSelectedTab = 0;
   String? _userName;
   String? _userHandle;
   String? _userEmail;
@@ -85,6 +87,7 @@ class AppController extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
   bool get hasCompletedAuthGate => _hasCompletedAuthGate;
+  int get lastSelectedTab => _lastSelectedTab;
   String? get userName => _userName;
   String? get userHandle => _userHandle;
   String? get userEmail => _userEmail;
@@ -148,6 +151,16 @@ class AppController extends ChangeNotifier {
       );
     _persistState();
     notifyListeners();
+  }
+
+  Future<void> setLastSelectedTab(int index) async {
+    final normalizedIndex = index < 0 ? 0 : index;
+    if (_lastSelectedTab == normalizedIndex) {
+      return;
+    }
+
+    _lastSelectedTab = normalizedIndex;
+    await _persistState();
   }
 
   BookmarkActionResult toggleBookmark(String id) {
@@ -244,6 +257,7 @@ class AppController extends ChangeNotifier {
       _hasCompletedOnboarding,
     );
     await preferences.setBool(_hasCompletedAuthGateKey, _hasCompletedAuthGate);
+    await preferences.setInt(_lastSelectedTabKey, _lastSelectedTab);
     await preferences.setStringList(
       _preferredCategoriesKey,
       _preferredCategories.toList(),
@@ -280,12 +294,8 @@ class AppController extends ChangeNotifier {
       return;
     }
 
-    _themeMode = ThemeMode.values.byName(
-      preferences.getString(_themeModeKey) ?? ThemeMode.light.name,
-    );
-    _fontScale = FontScaleOption.values.byName(
-      preferences.getString(_fontScaleKey) ?? FontScaleOption.normal.name,
-    );
+    _themeMode = _restoreThemeMode(preferences.getString(_themeModeKey));
+    _fontScale = _restoreFontScale(preferences.getString(_fontScaleKey));
     _notificationsEnabled =
         preferences.getBool(_notificationsEnabledKey) ?? true;
     _isLoggedIn = preferences.getBool(_isLoggedInKey) ?? false;
@@ -293,6 +303,9 @@ class AppController extends ChangeNotifier {
         preferences.getBool(_hasCompletedOnboardingKey) ?? false;
     _hasCompletedAuthGate =
         preferences.getBool(_hasCompletedAuthGateKey) ?? false;
+    _lastSelectedTab = _restoreLastSelectedTab(
+      preferences.getInt(_lastSelectedTabKey),
+    );
     _userName = preferences.getString(_userNameKey);
     _userHandle = preferences.getString(_userHandleKey);
     _userEmail = preferences.getString(_userEmailKey);
@@ -309,16 +322,47 @@ class AppController extends ChangeNotifier {
     final storedNotifications = preferences.getStringList(_notificationsKey);
     if (storedNotifications == null || storedNotifications.isEmpty) {
       _notifications = List<AppNotification>.from(_defaultNotifications);
-      return;
+    } else {
+      _notifications = storedNotifications
+          .map(_parseNotification)
+          .whereType<AppNotification>()
+          .toList();
+      if (_notifications.isEmpty) {
+        _notifications = List<AppNotification>.from(_defaultNotifications);
+      }
     }
 
-    _notifications = storedNotifications
-        .map(_parseNotification)
-        .whereType<AppNotification>()
-        .toList();
-    if (_notifications.isEmpty) {
-      _notifications = List<AppNotification>.from(_defaultNotifications);
+    if (!_isLoggedIn) {
+      _userName = null;
+      _userHandle = null;
+      _userEmail = null;
+      _bookmarks.clear();
     }
+  }
+
+  ThemeMode _restoreThemeMode(String? value) {
+    for (final item in ThemeMode.values) {
+      if (item.name == value) {
+        return item;
+      }
+    }
+    return ThemeMode.light;
+  }
+
+  FontScaleOption _restoreFontScale(String? value) {
+    for (final item in FontScaleOption.values) {
+      if (item.name == value) {
+        return item;
+      }
+    }
+    return FontScaleOption.normal;
+  }
+
+  int _restoreLastSelectedTab(int? value) {
+    if (value == null || value < 0 || value > 3) {
+      return 0;
+    }
+    return value;
   }
 
   AppNotification? _parseNotification(String value) {
