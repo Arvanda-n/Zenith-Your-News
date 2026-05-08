@@ -7,45 +7,41 @@ import 'package:zyn_flutter_app/state/app_controller.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets(
-    'ZYN app membuka gerbang akun setelah onboarding lalu menyimpan skip',
-    (WidgetTester tester) async {
-      SharedPreferences.setMockInitialValues(<String, Object>{});
+  testWidgets('ZYN app membuka onboarding baru lalu menyimpan skip auth gate', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
 
-      await tester.pumpWidget(const ZynApp());
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(const ZynApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Mulai dengan ZYN'), findsOneWidget);
+    expect(find.text('Selamat Datang di ZYN'), findsOneWidget);
+    expect(find.text('Lewati'), findsOneWidget);
 
-      await tester.ensureVisible(find.text('Teknologi'));
-      await tester.tap(find.text('Teknologi'));
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Lanjutkan ke Beranda'));
-      await tester.tap(find.text('Lanjutkan ke Beranda'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Lewati'));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Akun ZYN'), findsOneWidget);
-      expect(find.text('Lewati dulu'), findsOneWidget);
+    expect(find.text('Masuk ke ZYN'), findsOneWidget);
+    expect(find.text('Lewati dulu'), findsOneWidget);
 
-      await tester.tap(find.text('Lewati dulu'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Lewati dulu'));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Beranda'), findsOneWidget);
-      expect(find.byIcon(Icons.local_fire_department_outlined), findsOneWidget);
+    expect(find.text('Beranda'), findsOneWidget);
+    expect(find.byIcon(Icons.local_fire_department_outlined), findsOneWidget);
 
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
 
-      await tester.pumpWidget(const ZynApp());
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(const ZynApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Mulai dengan ZYN'), findsNothing);
-      expect(find.text('Akun ZYN'), findsNothing);
-      expect(find.text('Beranda'), findsOneWidget);
-    },
-  );
+    expect(find.text('Selamat Datang di ZYN'), findsNothing);
+    expect(find.text('Masuk ke ZYN'), findsNothing);
+    expect(find.text('Beranda'), findsOneWidget);
+  });
 
   test(
     'AppController memulihkan preferensi sesi dan fallback aman untuk data lama',

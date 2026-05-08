@@ -11,7 +11,13 @@ class NewsItem {
     required this.imageUrl,
     this.featured = false,
     this.trendingScore = 0,
-  });
+    this.author = 'Tim ZYN',
+    this.location = 'Jakarta',
+    this.articleParagraphs = const <String>[],
+    String? inlineImageUrl,
+    String? inlineImageHint,
+  }) : inlineImageUrl = inlineImageUrl ?? imageUrl,
+       inlineImageHint = inlineImageHint ?? imageHint;
 
   final String id;
   final String title;
@@ -24,4 +30,9 @@ class NewsItem {
   final String imageUrl;
   final bool featured;
   final int trendingScore;
+  final String author;
+  final String location;
+  final List<String> articleParagraphs;
+  final String inlineImageUrl;
+  final String inlineImageHint;
 }

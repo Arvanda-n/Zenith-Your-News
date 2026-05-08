@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/news_item.dart';
@@ -32,20 +34,50 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _headlineController = PageController();
+  final PageController _headlineController = PageController(
+    viewportFraction: 1,
+  );
+  Timer? _carouselTimer;
   int _headlineIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _startAutoSlide();
+  }
+
+  @override
   void dispose() {
+    _carouselTimer?.cancel();
     _headlineController.dispose();
     super.dispose();
+  }
+
+  void _startAutoSlide() {
+    _carouselTimer?.cancel();
+    _carouselTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted || !_headlineController.hasClients) {
+        return;
+      }
+
+      final featuredCount = widget.news.where((item) => item.featured).length;
+      if (featuredCount < 2) {
+        return;
+      }
+
+      final nextIndex = (_headlineIndex + 1) % featuredCount;
+      _headlineController.animateToPage(
+        nextIndex,
+        duration: const Duration(milliseconds: 460),
+        curve: Curves.easeOutCubic,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final compactLayout = media.size.width < 380;
-    final accessibilityLayout = media.textScaler.scale(1) > 1.15;
     final preferredCategories = widget.controller.preferredCategories;
     final featuredItems = _prioritizeByPreference(
       widget.news.where((item) => item.featured),
@@ -56,24 +88,18 @@ class _HomeScreenState extends State<HomeScreen> {
       preferredCategories,
     ).take(6).toList();
     final latest = _sortLatest(widget.news, preferredCategories);
-
-    final highlightedCategories = <String, int>{};
-    for (final item in widget.news) {
-      highlightedCategories.update(
-        item.categoryLabel,
-        (value) => value + 1,
-        ifAbsent: () => 1,
-      );
-    }
-    final categoryEntries = highlightedCategories.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final topicLabels = widget.news
+        .map((item) => item.categoryLabel)
+        .toSet()
+        .take(8)
+        .toList();
 
     final greeting = widget.controller.isLoggedIn
         ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
         : 'Selamat datang di ZYN';
     final preferenceSummary = preferredCategories.isEmpty
-        ? 'Buka berita penting hari ini dengan sorotan visual yang lebih rapi dan mudah dijelajahi.'
-        : 'Fokus hari ini: ${preferredCategories.join(', ')}';
+        ? 'Berita premium yang disusun ringkas, visual, dan siap kamu jelajahi kapan pun.'
+        : 'Feed hari ini diprioritaskan untuk: ${preferredCategories.join(', ')}';
 
     return AnimatedBuilder(
       animation: widget.controller,
@@ -122,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: _QuickActionCard(
                         title: 'Kategori',
-                        subtitle: 'Jelajahi topik',
+                        subtitle: 'Topik pilihan',
                         icon: Icons.grid_view_rounded,
                         onTap: widget.onOpenCategories,
                       ),
@@ -134,66 +160,62 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionHeader(
-                      title: 'Untuk Anda',
-                      subtitle: preferredCategories.isEmpty
-                          ? 'Pilihan paling relevan berdasarkan momentum hari ini.'
-                          : 'Kurasi diprioritaskan dari minat yang kamu pilih saat onboarding.',
-                      actionLabel: 'Buka',
-                      onAction: widget.onOpenForYou,
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: compactLayout || accessibilityLayout ? 308 : 324,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: curatedItems.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(width: 12),
-                        itemBuilder: (context, index) {
-                          final item = curatedItems[index];
-                          return _CuratedCard(
-                            item: item,
-                            compactLayout: compactLayout,
-                            onTap: () => widget.onOpenDetail(item),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                child: _SectionHeader(
+                  title: 'Headline Utama',
+                  subtitle:
+                      'Sorotan besar dengan transisi otomatis dan navigasi swipe yang halus.',
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                child: SizedBox(
+                  height: compactLayout ? 236 : 254,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: curatedItems.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final item = curatedItems[index];
+                      return _CuratedCard(
+                        item: item,
+                        compactLayout: compactLayout,
+                        onTap: () => widget.onOpenDetail(item),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionHeader(
-                      title: 'Jelajahi Topik',
-                      subtitle:
-                          'Semua kategori sudah dirapikan agar pengalaman membaca terasa lebih lengkap.',
-                      actionLabel: 'Lihat semua',
-                      onAction: widget.onOpenCategories,
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: categoryEntries
-                          .map(
-                            (entry) => ActionChip(
-                              label: Text('${entry.key} • ${entry.value}'),
-                              onPressed: widget.onOpenCategories,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
+                child: _SectionHeader(
+                  title: 'Jelajahi Topik',
+                  subtitle:
+                      'Kategori ringkas yang dibuat clean, ringan, dan mudah dipindai.',
+                  actionLabel: 'Lihat semua',
+                  onAction: widget.onOpenCategories,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: topicLabels
+                      .map(
+                        (label) => _TopicCard(
+                          label: label,
+                          icon: _topicIcons[label] ?? Icons.newspaper_rounded,
+                          onTap: widget.onOpenCategories,
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
             ),
@@ -203,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: _SectionHeader(
                   title: 'Berita Terbaru',
                   subtitle:
-                      'Rangkuman berita terbaru yang tetap nyaman dibaca.',
+                      'Artikel lengkap dengan gaya layout yang lebih dekat ke aplikasi berita profesional.',
                 ),
               ),
             ),
@@ -217,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _LatestTile(
                       item: item,
-                      compactLayout: compactLayout || accessibilityLayout,
+                      compactLayout: compactLayout,
                       onTap: () => widget.onOpenDetail(item),
                     ),
                   );
@@ -267,6 +289,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+const Map<String, IconData> _topicIcons = <String, IconData>{
+  'Teknologi': Icons.memory_rounded,
+  'Ekonomi': Icons.trending_up_rounded,
+  'Perkotaan': Icons.location_city_rounded,
+  'Gaya Hidup': Icons.weekend_rounded,
+  'Pendidikan': Icons.school_rounded,
+  'Olahraga': Icons.sports_soccer_rounded,
+  'Inovasi': Icons.lightbulb_rounded,
+  'Wisata': Icons.explore_rounded,
+  'Bisnis': Icons.business_center_rounded,
+  'Kesehatan': Icons.favorite_rounded,
+};
+
 class _TopHeroSection extends StatelessWidget {
   const _TopHeroSection({
     required this.greeting,
@@ -301,7 +336,11 @@ class _TopHeroSection extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF0E4FD6), Color(0xFF116FEF), Color(0xFF2EC5FF)],
+          colors: <Color>[
+            Color(0xFF0C49B8),
+            Color(0xFF116FEF),
+            Color(0xFF2EC5FF),
+          ],
         ),
         borderRadius: BorderRadius.circular(32),
       ),
@@ -366,7 +405,7 @@ class _TopHeroSection extends StatelessWidget {
                                 ? '9+'
                                 : '$unreadNotificationCount',
                             style: const TextStyle(
-                              color: Color(0xFF312E81),
+                              color: Color(0xFF0C49B8),
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
                             ),
@@ -391,17 +430,18 @@ class _TopHeroSection extends StatelessWidget {
             const SizedBox(height: 18),
             if (featuredItems.isNotEmpty) ...[
               SizedBox(
-                height: compactLayout ? 336 : 320,
+                height: compactLayout ? 390 : 430,
                 child: PageView.builder(
                   controller: headlineController,
-                  onPageChanged: onPageChanged,
                   itemCount: featuredItems.length,
+                  onPageChanged: onPageChanged,
                   itemBuilder: (context, index) {
                     final item = featuredItems[index];
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: _HeadlineCard(
                         item: item,
+                        compactLayout: compactLayout,
                         showSwipeHint: featuredItems.length > 1,
                         onTap: () => onOpenDetail(item),
                       ),
@@ -412,37 +452,59 @@ class _TopHeroSection extends StatelessWidget {
               if (featuredItems.length > 1) ...[
                 const SizedBox(height: 14),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(featuredItems.length, (index) {
-                    final active = index == headlineIndex;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: active ? 24 : 8,
-                      height: 8,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(featuredItems.length, (index) {
+                          final active = index == headlineIndex;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: active ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: active
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.28),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: active
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.28),
+                        color: Colors.white.withValues(alpha: 0.14),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                    );
-                  }),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 15,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Auto',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            ] else
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Text(
-                  'Belum ada headline yang siap ditampilkan. Coba buka kategori untuk mulai menjelajah berita.',
-                  style: TextStyle(color: Colors.white, height: 1.5),
-                ),
-              ),
+            ],
           ],
         ),
       ),
@@ -476,11 +538,13 @@ class _HeroActionButton extends StatelessWidget {
 class _HeadlineCard extends StatelessWidget {
   const _HeadlineCard({
     required this.item,
+    required this.compactLayout,
     required this.showSwipeHint,
     required this.onTap,
   });
 
   final NewsItem item;
+  final bool compactLayout;
   final bool showSwipeHint;
   final VoidCallback onTap;
 
@@ -503,9 +567,9 @@ class _HeadlineCard extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.06),
-                    Colors.black.withValues(alpha: 0.82),
+                  colors: <Color>[
+                    Colors.black.withValues(alpha: 0.08),
+                    Colors.black.withValues(alpha: 0.80),
                   ],
                 ),
               ),
@@ -538,8 +602,8 @@ class _HeadlineCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (showSwipeHint) ...[
-                        const SizedBox(width: 10),
+                      const SizedBox(width: 8),
+                      if (showSwipeHint)
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -568,17 +632,35 @@ class _HeadlineCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ],
                     ],
                   ),
                   const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      'Oleh ${item.author} | ${item.readMinutes} menit baca',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   Text(
                     item.title,
-                    maxLines: 3,
+                    maxLines: compactLayout ? 3 : 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
+                      height: 1.15,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -589,30 +671,14 @@ class _HeadlineCard extends StatelessWidget {
                     style: const TextStyle(color: Colors.white70, height: 1.45),
                   ),
                   const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      FilledButton(
-                        onPressed: onTap,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          minimumSize: const Size(0, 48),
-                        ),
-                        child: const Text('Baca sekarang'),
-                      ),
-                      Text(
-                        '${item.readMinutes} menit baca',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  FilledButton(
+                    onPressed: onTap,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      minimumSize: const Size(0, 50),
+                    ),
+                    child: const Text('Baca sekarang'),
                   ),
                 ],
               ),
@@ -721,6 +787,66 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
+class _TopicCard extends StatelessWidget {
+  const _TopicCard({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = (MediaQuery.of(context).size.width - 56) / 2;
+
+    return SizedBox(
+      width: width.clamp(150.0, 220.0),
+      child: Card(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _CuratedCard extends StatelessWidget {
   const _CuratedCard({
     required this.item,
@@ -735,7 +861,7 @@ class _CuratedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: compactLayout ? 236 : 264,
+      width: compactLayout ? 240 : 272,
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -746,7 +872,7 @@ class _CuratedCard extends StatelessWidget {
               NewsImage(
                 imageUrl: item.imageUrl,
                 imageHint: item.imageHint,
-                height: 124,
+                height: 132,
                 borderRadius: BorderRadius.zero,
               ),
               Expanded(
@@ -786,7 +912,7 @@ class _CuratedCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        '${item.readMinutes} menit baca',
+                        '${item.author} | ${item.readMinutes} menit baca',
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,
                           fontWeight: FontWeight.w600,
@@ -830,8 +956,8 @@ class _LatestTile extends StatelessWidget {
               NewsImage(
                 imageUrl: item.imageUrl,
                 imageHint: item.imageHint,
-                width: compactLayout ? double.infinity : 104,
-                height: 104,
+                width: compactLayout ? double.infinity : 114,
+                height: compactLayout ? 180 : 114,
                 borderRadius: BorderRadius.circular(18),
               ),
               SizedBox(
@@ -877,7 +1003,13 @@ class _LatestTileContent extends StatelessWidget {
         const SizedBox(height: 8),
         Text(item.description, maxLines: 2, overflow: TextOverflow.ellipsis),
         const SizedBox(height: 10),
-        Text('${item.readMinutes} menit baca'),
+        Text(
+          '${item.author} | ${item.readMinutes} menit baca',
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodySmall?.color,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }

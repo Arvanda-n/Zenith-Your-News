@@ -1,5 +1,31 @@
 import '../models/news_item.dart';
 
+const Map<String, List<String>> _categoryAuthors = <String, List<String>>{
+  'Teknologi': <String>['Raka Mahendra', 'Naila Putri', 'Aditya Prasetyo'],
+  'Ekonomi': <String>['Maya Kartika', 'Farhan Akbar', 'Rizki Ananta'],
+  'Perkotaan': <String>['Intan Lestari', 'Bima Alamsyah', 'Nadira Khansa'],
+  'Gaya Hidup': <String>['Ayu Wicaksana', 'Gilang Fajar', 'Salsa Amelia'],
+  'Pendidikan': <String>['Dewi Larasati', 'Fikri Ramadhan', 'Rani Putera'],
+  'Olahraga': <String>['Bagas Saputra', 'Yasmin Nabila', 'Hafiz Alif'],
+  'Inovasi': <String>['Rafi Adinata', 'Tiara Anggraini', 'Kevin Maulana'],
+  'Wisata': <String>['Nisa Khairani', 'Rendra Maulana', 'Mutiara Putri'],
+  'Bisnis': <String>['Dimas Prawira', 'Karina Utami', 'Satrio Mahesa'],
+  'Kesehatan': <String>['Sinta Maharani', 'Dito Wirawan', 'Aulia Rahma'],
+};
+
+const Map<String, String> _categoryLocations = <String, String>{
+  'Teknologi': 'Jakarta',
+  'Ekonomi': 'Singapura',
+  'Perkotaan': 'Surabaya',
+  'Gaya Hidup': 'Bandung',
+  'Pendidikan': 'Yogyakarta',
+  'Olahraga': 'Jakarta',
+  'Inovasi': 'Bandung',
+  'Wisata': 'Labuan Bajo',
+  'Bisnis': 'Jakarta',
+  'Kesehatan': 'Semarang',
+};
+
 NewsItem _newsItem({
   required String id,
   required String title,
@@ -12,7 +38,12 @@ NewsItem _newsItem({
   required String imageUrl,
   bool featured = false,
   int trendingScore = 0,
+  String? author,
+  String? location,
+  String? inlineImageUrl,
+  String? inlineImageHint,
 }) {
+  final resolvedLocation = location ?? _locationFor(category);
   return NewsItem(
     id: id,
     title: title,
@@ -25,7 +56,44 @@ NewsItem _newsItem({
     imageUrl: imageUrl,
     featured: featured,
     trendingScore: trendingScore,
+    author: author ?? _authorFor(id, category),
+    location: resolvedLocation,
+    articleParagraphs: _buildArticleParagraphs(
+      title: title,
+      description: description,
+      content: content,
+      category: category,
+      location: resolvedLocation,
+    ),
+    inlineImageUrl: inlineImageUrl ?? imageUrl,
+    inlineImageHint: inlineImageHint ?? imageHint,
   );
+}
+
+String _authorFor(String id, String category) {
+  final candidates = _categoryAuthors[category] ?? const <String>['Tim ZYN'];
+  final numericPart = int.tryParse(id.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+  return candidates[numericPart % candidates.length];
+}
+
+String _locationFor(String category) {
+  return _categoryLocations[category] ?? 'Jakarta';
+}
+
+List<String> _buildArticleParagraphs({
+  required String title,
+  required String description,
+  required String content,
+  required String category,
+  required String location,
+}) {
+  return <String>[
+    '$location - $description Laporan ini menjadi sorotan di kanal $category karena dampaknya terasa langsung bagi pembaca muda yang mengikuti perkembangan industri dan gaya hidup urban.',
+    content,
+    'Sejumlah pelaku di lapangan menyebut perkembangan terbaru ini menunjukkan perubahan prioritas yang lebih realistis. Fokus mereka tidak lagi hanya pada pertumbuhan cepat, tetapi juga pada efisiensi, pengalaman pengguna, dan keberlanjutan model bisnis atau layanan.',
+    'Analis menilai cerita seperti "$title" memperlihatkan bahwa pasar Indonesia bergerak ke fase yang lebih matang. Pengambilan keputusan kini lebih banyak ditopang data, kolaborasi lintas sektor, dan kebutuhan publik akan produk atau layanan yang benar-benar relevan.',
+    'Dalam jangka pendek, perhatian akan tertuju pada bagaimana respons pengguna, regulator, dan mitra industri terhadap perubahan ini. Jika momentum terjaga, langkah lanjutan diperkirakan hadir dalam bentuk ekspansi layanan, pembaruan kebijakan, dan inovasi produk yang lebih terukur.',
+  ];
 }
 
 final List<NewsItem> dummyNews = <NewsItem>[
@@ -168,7 +236,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n10',
-    title: 'Sektor Logistik Didorong Pakai Analitik untuk Pangkas Biaya Operasi',
+    title:
+        'Sektor Logistik Didorong Pakai Analitik untuk Pangkas Biaya Operasi',
     description:
         'Perusahaan distribusi mulai mengatur rute harian berdasarkan data permintaan.',
     content:
@@ -244,7 +313,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n15',
-    title: 'Bus Listrik Antarpermukiman Diuji pada Jam Sibuk Pagi Jakarta Timur',
+    title:
+        'Bus Listrik Antarpermukiman Diuji pada Jam Sibuk Pagi Jakarta Timur',
     description:
         'Rute pengumpan baru ditargetkan menekan ketergantungan kendaraan pribadi.',
     content:
@@ -274,7 +344,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n17',
-    title: 'Klub Lari Subuh Makin Ramai karena Kombinasi Olahraga dan Networking',
+    title:
+        'Klub Lari Subuh Makin Ramai karena Kombinasi Olahraga dan Networking',
     description:
         'Komunitas kebugaran urban kini juga jadi ruang bertemu profesional lintas bidang.',
     content:
@@ -289,7 +360,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n18',
-    title: 'Meja Kerja Modular Jadi Favorit bagi Pekerja Hybrid dan Kreator Konten',
+    title:
+        'Meja Kerja Modular Jadi Favorit bagi Pekerja Hybrid dan Kreator Konten',
     description:
         'Permintaan furnitur fleksibel naik seiring tren kerja dari rumah yang lebih mapan.',
     content:
@@ -394,7 +466,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n25',
-    title: 'Komunitas Guru Matematika Berbagi Modul Visual untuk Sekolah Daerah',
+    title:
+        'Komunitas Guru Matematika Berbagi Modul Visual untuk Sekolah Daerah',
     description:
         'Materi ajar ringan dan siap cetak dibagikan gratis melalui platform terbuka.',
     content:
@@ -440,7 +513,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n28',
-    title: 'Komunitas Basket Jalanan Bangun Liga Antarwilayah dengan Sponsor Lokal',
+    title:
+        'Komunitas Basket Jalanan Bangun Liga Antarwilayah dengan Sponsor Lokal',
     description:
         'Ekosistem olahraga akar rumput berkembang lewat produksi konten yang konsisten.',
     content:
@@ -455,7 +529,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n29',
-    title: 'Renang Perairan Terbuka Jadi Cabang Favorit Baru untuk Event Wisata',
+    title:
+        'Renang Perairan Terbuka Jadi Cabang Favorit Baru untuk Event Wisata',
     description:
         'Daerah pesisir mulai menggabungkan lomba olahraga dengan promosi destinasi.',
     content:
@@ -546,7 +621,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n35',
-    title: 'Studio Audio Lokal Bangun Alat Perekam Lapangan untuk Kreator Dokumenter',
+    title:
+        'Studio Audio Lokal Bangun Alat Perekam Lapangan untuk Kreator Dokumenter',
     description:
         'Perangkat ringkas ini dirancang tangguh untuk kondisi cuaca tropis.',
     content:
@@ -621,7 +697,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n40',
-    title: 'Pendakian Ramah Pemula di Jawa Barat Makin Populer Berkat Reservasi Digital',
+    title:
+        'Pendakian Ramah Pemula di Jawa Barat Makin Populer Berkat Reservasi Digital',
     description:
         'Jalur favorit kini lebih tertib karena kuota dan jadwal kunjungan dipantau daring.',
     content:
@@ -696,7 +773,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n45',
-    title: 'Rantai Toko Bahan Bangunan Pakai Aplikasi untuk Prediksi Permintaan',
+    title:
+        'Rantai Toko Bahan Bangunan Pakai Aplikasi untuk Prediksi Permintaan',
     description:
         'Stok proyek rumah tinggal kini disesuaikan dengan tren pembangunan kawasan.',
     content:
@@ -756,7 +834,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n49',
-    title: 'Aplikasi Kebugaran Lokal Tambah Program Pemula dengan Pelatih Langsung',
+    title:
+        'Aplikasi Kebugaran Lokal Tambah Program Pemula dengan Pelatih Langsung',
     description:
         'Pendekatan pendampingan dinilai membuat pengguna lebih konsisten berolahraga.',
     content:
@@ -771,7 +850,8 @@ final List<NewsItem> dummyNews = <NewsItem>[
   ),
   _newsItem(
     id: 'n50',
-    title: 'Puskesmas Kota Mulai Buka Sesi Edukasi Kesehatan Mental untuk Orang Tua',
+    title:
+        'Puskesmas Kota Mulai Buka Sesi Edukasi Kesehatan Mental untuk Orang Tua',
     description:
         'Program komunitas ini menyoroti stres pengasuhan dan pentingnya dukungan rumah.',
     content:

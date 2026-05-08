@@ -150,7 +150,7 @@ class _RootShellState extends State<RootShell> {
     widget.controller.setLastSelectedTab(index);
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 360),
+      duration: const Duration(milliseconds: 420),
       curve: Curves.easeOutCubic,
     );
   }
@@ -228,12 +228,12 @@ class _RootShellState extends State<RootShell> {
           ),
           bottomNavigationBar: SafeArea(
             top: false,
-            minimum: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+            minimum: const EdgeInsets.fromLTRB(14, 0, 14, 16),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: isDark
                     ? const Color(0xFF161B2E).withValues(alpha: 0.96)
-                    : Colors.white,
+                    : Colors.white.withValues(alpha: 0.98),
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
                   color: isDark
@@ -243,24 +243,15 @@ class _RootShellState extends State<RootShell> {
                 boxShadow: [
                   BoxShadow(
                     color: (isDark ? Colors.black : const Color(0xFF0F5EEA))
-                        .withValues(alpha: isDark ? 0.30 : 0.12),
+                        .withValues(alpha: isDark ? 0.28 : 0.12),
                     blurRadius: 36,
                     offset: const Offset(0, 18),
-                  ),
-                  BoxShadow(
-                    color:
-                        (isDark
-                                ? const Color(0xFF0E4FD6)
-                                : const Color(0xFF1D4ED8))
-                            .withValues(alpha: isDark ? 0.22 : 0.08),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
+                  horizontal: 10,
                   vertical: 10,
                 ),
                 child: Row(
@@ -309,11 +300,6 @@ class _BottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final inactiveColor = isDark ? Colors.white70 : const Color(0xFF72809B);
     final activeForeground = isDark ? Colors.white : const Color(0xFF0E4AA8);
-    final activeWidth = switch (label) {
-      'Beranda' => 106.0,
-      'Simpan' => 102.0,
-      _ => 94.0,
-    };
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -322,76 +308,68 @@ class _BottomNavItem extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(999),
           onTap: onTap,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final targetWidth = selected ? activeWidth : 56.0;
-              final resolvedWidth = targetWidth.clamp(
-                56.0,
-                constraints.maxWidth,
-              );
-              final canShowLabel = selected && resolvedWidth >= activeWidth - 2;
-
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 320),
-                curve: Curves.easeOutCubic,
-                height: 60,
-                width: resolvedWidth,
-                padding: EdgeInsets.symmetric(
-                  horizontal: canShowLabel ? 14 : 0,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  gradient: selected
-                      ? LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: isDark
-                              ? const [Color(0xFF0F5EEA), Color(0xFF2EC5FF)]
-                              : const [Color(0xFFDCEBFF), Color(0xFFEEF8FF)],
-                        )
-                      : null,
-                  color: selected || !isDark
-                      ? null
-                      : Colors.white.withValues(alpha: 0.03),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: ClipRect(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedSlide(
-                        duration: const Duration(milliseconds: 280),
-                        offset: selected ? Offset.zero : const Offset(0, 0.04),
-                        curve: Curves.easeOutCubic,
-                        child: AnimatedScale(
-                          duration: const Duration(milliseconds: 280),
-                          scale: selected ? 1.08 : 1,
-                          curve: Curves.easeOutBack,
-                          child: Icon(
-                            selected ? selectedIcon : icon,
-                            color: selected ? activeForeground : inactiveColor,
-                            size: selected ? 24 : 23,
-                          ),
-                        ),
-                      ),
-                      if (canShowLabel) ...[
-                        const SizedBox(width: 10),
-                        Text(
-                          label,
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: activeForeground,
-                            fontSize: 11.6,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
-                    ],
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 320),
+            curve: Curves.easeOutCubic,
+            height: 62,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              gradient: selected
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? const <Color>[Color(0xFF0F5EEA), Color(0xFF2EC5FF)]
+                          : const <Color>[Color(0xFFDCEBFF), Color(0xFFEEF8FF)],
+                    )
+                  : null,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedRotation(
+                  duration: const Duration(milliseconds: 280),
+                  turns: selected ? 0.0 : -0.015,
+                  child: AnimatedScale(
+                    duration: const Duration(milliseconds: 280),
+                    scale: selected ? 1.12 : 1,
+                    curve: Curves.easeOutBack,
+                    child: Icon(
+                      selected ? selectedIcon : icon,
+                      color: selected ? activeForeground : inactiveColor,
+                      size: selected ? 24 : 22,
+                    ),
                   ),
                 ),
-              );
-            },
+                const SizedBox(height: 4),
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 220),
+                  style: TextStyle(
+                    color: selected ? activeForeground : inactiveColor,
+                    fontSize: 11.6,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  margin: const EdgeInsets.only(top: 4),
+                  width: selected ? 18 : 6,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? activeForeground
+                        : activeForeground.withValues(alpha: 0),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
