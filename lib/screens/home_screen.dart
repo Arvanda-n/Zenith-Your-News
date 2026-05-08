@@ -98,8 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ? 'Halo, ${widget.controller.userName ?? 'Pembaca ZYN'}'
         : 'Selamat datang di ZYN';
     final preferenceSummary = preferredCategories.isEmpty
-        ? 'Berita premium yang disusun ringkas, visual, dan siap kamu jelajahi kapan pun.'
-        : 'Feed hari ini diprioritaskan untuk: ${preferredCategories.join(', ')}';
+        ? 'Ringkasan berita pilihan untuk hari ini.'
+        : 'Diprioritaskan untuk ${preferredCategories.join(', ')}';
 
     return AnimatedBuilder(
       animation: widget.controller,
@@ -133,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
                 child: Row(
                   children: [
                     Expanded(
@@ -159,11 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
                 child: _SectionHeader(
                   title: 'Headline Utama',
-                  subtitle:
-                      'Sorotan besar dengan transisi otomatis dan navigasi swipe yang halus.',
                 ),
               ),
             ),
@@ -191,11 +189,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
                 child: _SectionHeader(
                   title: 'Jelajahi Topik',
-                  subtitle:
-                      'Kategori ringkas yang dibuat clean, ringan, dan mudah dipindai.',
                   actionLabel: 'Lihat semua',
                   onAction: widget.onOpenCategories,
                 ),
@@ -221,11 +217,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
                 child: _SectionHeader(
                   title: 'Berita Terbaru',
-                  subtitle:
-                      'Artikel lengkap dengan gaya layout yang lebih dekat ke aplikasi berita profesional.',
                 ),
               ),
             ),
@@ -337,15 +331,22 @@ class _TopHeroSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: <Color>[
+            Color(0xFF081A3A),
             Color(0xFF0C49B8),
-            Color(0xFF116FEF),
-            Color(0xFF2EC5FF),
+            Color(0xFF15B9D6),
           ],
         ),
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(36),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF081A3A).withValues(alpha: 0.10),
+            blurRadius: 24,
+            offset: const Offset(0, 14),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -369,7 +370,7 @@ class _TopHeroSection extends StatelessWidget {
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ],
@@ -416,21 +417,21 @@ class _TopHeroSection extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
               preferenceSummary,
-              maxLines: compactLayout ? 3 : 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white70,
-                fontSize: 14,
-                height: 1.5,
+                fontSize: 13,
+                height: 1.3,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 14),
             if (featuredItems.isNotEmpty) ...[
               SizedBox(
-                height: compactLayout ? 390 : 430,
+                height: compactLayout ? 246 : 270,
                 child: PageView.builder(
                   controller: headlineController,
                   itemCount: featuredItems.length,
@@ -442,7 +443,6 @@ class _TopHeroSection extends StatelessWidget {
                       child: _HeadlineCard(
                         item: item,
                         compactLayout: compactLayout,
-                        showSwipeHint: featuredItems.length > 1,
                         onTap: () => onOpenDetail(item),
                       ),
                     );
@@ -450,7 +450,7 @@ class _TopHeroSection extends StatelessWidget {
                 ),
               ),
               if (featuredItems.length > 1) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
@@ -461,44 +461,16 @@ class _TopHeroSection extends StatelessWidget {
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 220),
                             margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: active ? 24 : 8,
-                            height: 8,
+                            width: active ? 22 : 7,
+                            height: 7,
                             decoration: BoxDecoration(
                               color: active
                                   ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.28),
+                                  : Colors.white.withValues(alpha: 0.22),
                               borderRadius: BorderRadius.circular(999),
                             ),
                           );
                         }),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.auto_awesome_rounded,
-                            size: 15,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 6),
-                          Text(
-                            'Auto',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ],
@@ -521,15 +493,15 @@ class _HeroActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 48,
-      height: 48,
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: IconButton(
         onPressed: onTap,
-        icon: Icon(icon, color: Colors.white),
+        icon: Icon(icon, color: Colors.white, size: 20),
       ),
     );
   }
@@ -539,18 +511,19 @@ class _HeadlineCard extends StatelessWidget {
   const _HeadlineCard({
     required this.item,
     required this.compactLayout,
-    required this.showSwipeHint,
     required this.onTap,
   });
 
   final NewsItem item;
   final bool compactLayout;
-  final bool showSwipeHint;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 1.2,
+      shadowColor: Colors.black.withValues(alpha: 0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -568,117 +541,54 @@ class _HeadlineCard extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: <Color>[
-                    Colors.black.withValues(alpha: 0.08),
-                    Colors.black.withValues(alpha: 0.80),
+                    Colors.black.withValues(alpha: 0.06),
+                    Colors.black.withValues(alpha: 0.68),
                   ],
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.16),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            item.categoryLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      if (showSwipeHint)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.swipe_rounded,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                'Geser',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                  const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 8,
+                      vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFF15B9D6).withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      'Oleh ${item.author} | ${item.readMinutes} menit baca',
+                      item.categoryLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const Spacer(),
                   Text(
                     item.title,
                     maxLines: compactLayout ? 3 : 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      height: 1.15,
+                      fontWeight: FontWeight.w900,
+                      height: 1.12,
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    item.description,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, height: 1.45),
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: onTap,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                      minimumSize: const Size(0, 50),
+                    '${item.author} • ${item.readMinutes} menit baca',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w600,
                     ),
-                    child: const Text('Baca sekarang'),
                   ),
                 ],
               ),
@@ -706,23 +616,26 @@ class _QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 1.0,
+      shadowColor: Colors.black.withValues(alpha: 0.04),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(26),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           child: Row(
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: 42,
+                height: 42,
                 decoration: BoxDecoration(
-                  gradient: AppTheme.brandGradient,
-                  borderRadius: BorderRadius.circular(16),
+                  color: AppTheme.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(icon, color: Colors.white),
+                child: Icon(icon, color: AppTheme.primary, size: 20),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -730,12 +643,20 @@ class _QuickActionCard extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(subtitle),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -750,13 +671,11 @@ class _QuickActionCard extends StatelessWidget {
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader({
     required this.title,
-    required this.subtitle,
     this.actionLabel,
     this.onAction,
   });
 
   final String title;
-  final String subtitle;
   final String? actionLabel;
   final VoidCallback? onAction;
 
@@ -766,18 +685,11 @@ class _SectionHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 4),
-              Text(subtitle),
-            ],
+          child: Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
           ),
         ),
         if (actionLabel != null && onAction != null)
@@ -805,11 +717,14 @@ class _TopicCard extends StatelessWidget {
     return SizedBox(
       width: width.clamp(150.0, 220.0),
       child: Card(
+        elevation: 1.0,
+        shadowColor: Colors.black.withValues(alpha: 0.04),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
         child: InkWell(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(26),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(17),
             child: Row(
               children: [
                 Container(
@@ -819,7 +734,7 @@ class _TopicCard extends StatelessWidget {
                     color: Theme.of(
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                   child: Icon(
                     icon,
@@ -833,7 +748,7 @@ class _TopicCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       height: 1.2,
                     ),
                   ),
@@ -863,6 +778,9 @@ class _CuratedCard extends StatelessWidget {
     return SizedBox(
       width: compactLayout ? 240 : 272,
       child: Card(
+        elevation: 1.2,
+        shadowColor: Colors.black.withValues(alpha: 0.05),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
@@ -877,7 +795,7 @@ class _CuratedCard extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -886,22 +804,22 @@ class _CuratedCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: const Color(0xFF0EA5C6),
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 7),
                       Text(
                         item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                           height: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Expanded(
                         child: Text(
                           item.description,
@@ -944,11 +862,14 @@ class _LatestTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 1.2,
+      shadowColor: Colors.black.withValues(alpha: 0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           child: Flex(
             direction: compactLayout ? Axis.vertical : Axis.horizontal,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -962,7 +883,7 @@ class _LatestTile extends StatelessWidget {
               ),
               SizedBox(
                 width: compactLayout ? 0 : 14,
-                height: compactLayout ? 12 : 0,
+                height: compactLayout ? 14 : 0,
               ),
               if (compactLayout)
                 _LatestTileContent(item: item)
@@ -998,7 +919,7 @@ class _LatestTileContent extends StatelessWidget {
           item.title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
         ),
         const SizedBox(height: 8),
         Text(item.description, maxLines: 2, overflow: TextOverflow.ellipsis),
