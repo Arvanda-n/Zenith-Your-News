@@ -32,6 +32,8 @@ class AppController extends ChangeNotifier {
   static const _userNameKey = 'user_name';
   static const _userHandleKey = 'user_handle';
   static const _userEmailKey = 'user_email';
+  static const _userBioKey = 'user_bio';
+  static const _userPhotoPathKey = 'user_photo_path';
   static const _lastSelectedTabKey = 'last_selected_tab';
   static const _bookmarksKey = 'bookmarks';
   static const _preferredCategoriesKey = 'preferred_categories';
@@ -50,6 +52,8 @@ class AppController extends ChangeNotifier {
   String? _userName;
   String? _userHandle;
   String? _userEmail;
+  String? _userBio;
+  String? _userPhotoPath;
   final Set<String> _bookmarks = <String>{};
   final Set<String> _preferredCategories = <String>{};
   List<AppNotification> _notifications = List<AppNotification>.from(
@@ -94,6 +98,8 @@ class AppController extends ChangeNotifier {
   String? get userName => _userName;
   String? get userHandle => _userHandle;
   String? get userEmail => _userEmail;
+  String? get userBio => _userBio;
+  String? get userPhotoPath => _userPhotoPath;
   List<AppNotification> get notifications => _notifications;
   Set<String> get preferredCategories => _preferredCategories;
   int get unreadNotificationCount =>
@@ -234,7 +240,39 @@ class AppController extends ChangeNotifier {
     _userName = null;
     _userHandle = null;
     _userEmail = null;
+    _userBio = null;
+    _userPhotoPath = null;
     _bookmarks.clear();
+    _persistState();
+    notifyListeners();
+  }
+
+  void updateProfile({
+    required String fullName,
+    required String handle,
+    required String bio,
+  }) {
+    if (!_isLoggedIn) {
+      return;
+    }
+
+    _userName = fullName.trim().isEmpty ? 'Pembaca ZYN' : fullName.trim();
+    _userHandle = _normalizeUsername(handle);
+    final normalizedBio = bio.trim();
+    _userBio = normalizedBio.isEmpty ? null : normalizedBio;
+    _persistState();
+    notifyListeners();
+  }
+
+  void updateProfilePhotoPath(String? path) {
+    if (!_isLoggedIn) {
+      return;
+    }
+
+    final normalizedPath = path?.trim();
+    _userPhotoPath = (normalizedPath == null || normalizedPath.isEmpty)
+        ? null
+        : normalizedPath;
     _persistState();
     notifyListeners();
   }
@@ -296,6 +334,18 @@ class AppController extends ChangeNotifier {
       await preferences.setString(_userEmailKey, _userEmail!);
     }
 
+    if (_userBio == null) {
+      await preferences.remove(_userBioKey);
+    } else {
+      await preferences.setString(_userBioKey, _userBio!);
+    }
+
+    if (_userPhotoPath == null) {
+      await preferences.remove(_userPhotoPathKey);
+    } else {
+      await preferences.setString(_userPhotoPathKey, _userPhotoPath!);
+    }
+
     await preferences.setStringList(
       _notificationsKey,
       _notifications.map((item) => jsonEncode(item.toMap())).toList(),
@@ -326,6 +376,8 @@ class AppController extends ChangeNotifier {
     _userName = preferences.getString(_userNameKey);
     _userHandle = preferences.getString(_userHandleKey);
     _userEmail = preferences.getString(_userEmailKey);
+    _userBio = preferences.getString(_userBioKey);
+    _userPhotoPath = preferences.getString(_userPhotoPathKey);
 
     _bookmarks
       ..clear()
@@ -353,6 +405,8 @@ class AppController extends ChangeNotifier {
       _userName = null;
       _userHandle = null;
       _userEmail = null;
+      _userBio = null;
+      _userPhotoPath = null;
       _bookmarks.clear();
     }
   }

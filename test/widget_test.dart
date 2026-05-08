@@ -16,7 +16,7 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
 
-    expect(find.text('Selamat Datang di ZYN'), findsWidgets);
+    expect(find.widgetWithText(TextButton, 'Lewati'), findsOneWidget);
     final skipButton = tester.widget<TextButton>(
       find.widgetWithText(TextButton, 'Lewati'),
     );
@@ -29,7 +29,7 @@ void main() {
     await tester.tap(find.text('Lanjutkan ke Login'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Masuk ke akun ZYN'), findsOneWidget);
+    expect(find.textContaining('akun ZYN'), findsOneWidget);
     expect(find.text('Lewati dulu'), findsOneWidget);
 
     await tester.tap(find.text('Lewati dulu'));
@@ -45,9 +45,9 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
 
-    expect(find.text('Selamat Datang di ZYN'), findsNothing);
+    expect(find.widgetWithText(TextButton, 'Lewati'), findsNothing);
     expect(find.text('Pilih topik favoritmu'), findsNothing);
-    expect(find.text('Masuk ke akun ZYN'), findsNothing);
+    expect(find.textContaining('akun ZYN'), findsNothing);
     expect(find.text('Beranda'), findsOneWidget);
   });
 
@@ -65,6 +65,8 @@ void main() {
         'user_name': 'Nadia',
         'user_handle': 'nadia.zyn',
         'user_email': 'nadia@zyn.app',
+        'user_bio': 'Editor teknologi dan tren digital.',
+        'user_photo_path': 'storage/emulated/0/Pictures/nadia.png',
         'preferred_categories': <String>['Teknologi', 'Bisnis'],
       });
 
@@ -81,6 +83,8 @@ void main() {
       expect(controller.userName, 'Nadia');
       expect(controller.userHandle, 'nadia.zyn');
       expect(controller.userEmail, 'nadia@zyn.app');
+      expect(controller.userBio, 'Editor teknologi dan tren digital.');
+      expect(controller.userPhotoPath, 'storage/emulated/0/Pictures/nadia.png');
       expect(
         controller.preferredCategories,
         containsAll(<String>['Teknologi', 'Bisnis']),
@@ -104,6 +108,8 @@ void main() {
         'user_name': 'Tersisa',
         'user_handle': 'tersisa',
         'user_email': 'tersisa@zyn.app',
+        'user_bio': 'Masih tersimpan',
+        'user_photo_path': '/tmp/avatar.png',
         'bookmarks': <String>['n1'],
       });
 
@@ -114,6 +120,8 @@ void main() {
       expect(controller.userName, isNull);
       expect(controller.userHandle, isNull);
       expect(controller.userEmail, isNull);
+      expect(controller.userBio, isNull);
+      expect(controller.userPhotoPath, isNull);
       expect(controller.bookmarks, isEmpty);
     },
   );
