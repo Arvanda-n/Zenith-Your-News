@@ -351,11 +351,12 @@ class _TopHeroSection extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
@@ -367,19 +368,30 @@ class _TopHeroSection extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          height: 1.25,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        preferenceSummary,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          height: 1.35,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _HeroSearchBar(
-                    compactLayout: compactLayout,
-                    onTap: onOpenSearch,
-                  ),
+                const SizedBox(width: 8),
+                _HeroActionButton(
+                  icon: Icons.search_rounded,
+                  onTap: onOpenSearch,
                 ),
                 const SizedBox(width: 8),
                 _HeroActionButton(
@@ -412,23 +424,12 @@ class _TopHeroSection extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              preferenceSummary,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 13,
-                height: 1.3,
-              ),
-            ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             if (featuredItems.isNotEmpty) ...[
               SizedBox(
                 height: compactLayout
-                    ? 246 + ((textScale - 1) * 52)
-                    : 270 + ((textScale - 1) * 44),
+                    ? 228 + ((textScale - 1) * 48)
+                    : 248 + ((textScale - 1) * 40),
                 child: PageView.builder(
                   controller: headlineController,
                   itemCount: featuredItems.length,
@@ -490,59 +491,15 @@ class _HeroActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 44,
-      height: 44,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white.withValues(alpha: 0.70),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: IconButton(
         onPressed: onTap,
-        icon: Icon(icon, color: Colors.white, size: 20),
-      ),
-    );
-  }
-}
-
-class _HeroSearchBar extends StatelessWidget {
-  const _HeroSearchBar({required this.compactLayout, required this.onTap});
-
-  final bool compactLayout;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Ink(
-          height: 44,
-          padding: EdgeInsets.symmetric(horizontal: compactLayout ? 12 : 14),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.search_rounded, color: Colors.white, size: 19),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Cari berita, topik, atau penulis',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.86),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        icon: Icon(icon, color: const Color(0xFF111827), size: 24),
       ),
     );
   }
