@@ -7,7 +7,7 @@ import 'package:zyn_flutter_app/state/app_controller.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('ZYN app membuka onboarding baru lalu menyimpan skip auth gate', (
+  testWidgets('ZYN app membuka intro lalu topik sebelum lanjut ke auth gate', (
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
@@ -16,13 +16,19 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
 
-    expect(find.text('Selamat Datang di ZYN'), findsOneWidget);
+    expect(find.text('Selamat Datang di ZYN'), findsWidgets);
     expect(find.text('Lewati'), findsOneWidget);
 
     await tester.tap(find.text('Lewati'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Masuk ke ZYN'), findsOneWidget);
+    expect(find.text('Pilih topik favoritmu'), findsOneWidget);
+    expect(find.text('Lanjutkan ke Login'), findsOneWidget);
+
+    await tester.tap(find.text('Lanjutkan ke Login'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Masuk ke akun ZYN'), findsOneWidget);
     expect(find.text('Lewati dulu'), findsOneWidget);
 
     await tester.tap(find.text('Lewati dulu'));
@@ -39,7 +45,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Selamat Datang di ZYN'), findsNothing);
-    expect(find.text('Masuk ke ZYN'), findsNothing);
+    expect(find.text('Pilih topik favoritmu'), findsNothing);
+    expect(find.text('Masuk ke akun ZYN'), findsNothing);
     expect(find.text('Beranda'), findsOneWidget);
   });
 

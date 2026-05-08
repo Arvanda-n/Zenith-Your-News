@@ -26,6 +26,7 @@ class AppController extends ChangeNotifier {
   static const _fontScaleKey = 'font_scale';
   static const _notificationsEnabledKey = 'notifications_enabled';
   static const _isLoggedInKey = 'is_logged_in';
+  static const _hasCompletedIntroKey = 'has_completed_intro';
   static const _hasCompletedOnboardingKey = 'has_completed_onboarding';
   static const _hasCompletedAuthGateKey = 'has_completed_auth_gate';
   static const _userNameKey = 'user_name';
@@ -42,6 +43,7 @@ class AppController extends ChangeNotifier {
   bool _notificationsEnabled = true;
   bool _isLoggedIn = false;
   bool _isReady = false;
+  bool _hasCompletedIntro = false;
   bool _hasCompletedOnboarding = false;
   bool _hasCompletedAuthGate = false;
   int _lastSelectedTab = 0;
@@ -85,6 +87,7 @@ class AppController extends ChangeNotifier {
   Set<String> get bookmarks => _bookmarks;
   bool get notificationsEnabled => _notificationsEnabled;
   bool get isLoggedIn => _isLoggedIn;
+  bool get hasCompletedIntro => _hasCompletedIntro;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
   bool get hasCompletedAuthGate => _hasCompletedAuthGate;
   int get lastSelectedTab => _lastSelectedTab;
@@ -113,6 +116,16 @@ class AppController extends ChangeNotifier {
 
   void setFontScale(FontScaleOption option) {
     _fontScale = option;
+    _persistState();
+    notifyListeners();
+  }
+
+  void completeIntro() {
+    if (_hasCompletedIntro) {
+      return;
+    }
+
+    _hasCompletedIntro = true;
     _persistState();
     notifyListeners();
   }
@@ -252,6 +265,7 @@ class AppController extends ChangeNotifier {
     await preferences.setString(_fontScaleKey, _fontScale.name);
     await preferences.setBool(_notificationsEnabledKey, _notificationsEnabled);
     await preferences.setBool(_isLoggedInKey, _isLoggedIn);
+    await preferences.setBool(_hasCompletedIntroKey, _hasCompletedIntro);
     await preferences.setBool(
       _hasCompletedOnboardingKey,
       _hasCompletedOnboarding,
@@ -299,8 +313,11 @@ class AppController extends ChangeNotifier {
     _notificationsEnabled =
         preferences.getBool(_notificationsEnabledKey) ?? true;
     _isLoggedIn = preferences.getBool(_isLoggedInKey) ?? false;
-    _hasCompletedOnboarding =
+    final hasCompletedOnboarding =
         preferences.getBool(_hasCompletedOnboardingKey) ?? false;
+    _hasCompletedIntro =
+        preferences.getBool(_hasCompletedIntroKey) ?? hasCompletedOnboarding;
+    _hasCompletedOnboarding = hasCompletedOnboarding;
     _hasCompletedAuthGate =
         preferences.getBool(_hasCompletedAuthGateKey) ?? false;
     _lastSelectedTab = _restoreLastSelectedTab(

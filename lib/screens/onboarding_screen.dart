@@ -6,14 +6,9 @@ import '../widgets/news_image.dart';
 import '../widgets/zyn_logo.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({
-    super.key,
-    required this.availableCategories,
-    required this.onComplete,
-  });
+  const OnboardingScreen({super.key, required this.onComplete});
 
-  final List<String> availableCategories;
-  final ValueChanged<Set<String>> onComplete;
+  final VoidCallback onComplete;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -21,7 +16,6 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
-  final Set<String> _selectedCategories = <String>{};
   int _pageIndex = 0;
 
   late final List<_OnboardingItem> _items = <_OnboardingItem>[
@@ -44,10 +38,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingItem(
       title: 'Ikuti Trending News Setiap Hari',
       description:
-          'Pilih topik favoritmu agar feed pertama terasa lebih personal sejak pertama kali aplikasi dibuka.',
+          'Pantau topik paling ramai dan nikmati tampilan yang terasa dekat dengan aplikasi berita profesional di Play Store.',
       imageUrl: dummyNews[25].imageUrl,
       imageHint: dummyNews[25].imageHint,
-      accentLabel: 'Trending + personal',
+      accentLabel: 'Trending setiap hari',
     ),
   ];
 
@@ -61,7 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _goNext() {
     if (_isLastPage) {
-      widget.onComplete(_selectedCategories);
+      widget.onComplete();
       return;
     }
 
@@ -107,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () => widget.onComplete(_selectedCategories),
+                    onPressed: widget.onComplete,
                     child: const Text('Lewati'),
                   ),
                 ],
@@ -157,46 +151,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pilih topik favoritmu',
+                        _items[_pageIndex].title,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        'Agar beranda pertama terasa lebih relevan, pilih satu atau beberapa topik utama yang ingin kamu ikuti.',
+                      const SizedBox(height: 8),
+                      Text(
+                        _items[_pageIndex].description,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(height: 1.5),
                       ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: widget.availableCategories.map((category) {
-                          final selected = _selectedCategories.contains(
-                            category,
-                          );
-                          return FilterChip(
-                            label: Text(category),
-                            selected: selected,
-                            onSelected: (_) {
-                              setState(() {
-                                if (selected) {
-                                  _selectedCategories.remove(category);
-                                } else {
-                                  _selectedCategories.add(category);
-                                }
-                              });
-                            },
-                          );
-                        }).toList(),
-                      ),
-                      if (_selectedCategories.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          'Pilihanmu: ${_selectedCategories.join(', ')}',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ],
                       const SizedBox(height: 20),
                       Row(
                         children: [

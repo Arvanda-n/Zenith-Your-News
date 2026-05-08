@@ -7,6 +7,7 @@ import 'screens/onboarding_screen.dart';
 import 'screens/root_shell.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/topic_selection_screen.dart';
 import 'state/app_controller.dart';
 import 'theme/app_theme.dart';
 import 'utils/news_category.dart';
@@ -93,6 +94,17 @@ class _ZynAppState extends State<ZynApp> {
             switchOutCurve: Curves.easeInCubic,
             child: _showSplash
                 ? const SplashScreen()
+                : !_controller.hasCompletedIntro
+                ? OnboardingScreen(
+                    key: const ValueKey('onboarding_screen'),
+                    onComplete: _controller.completeIntro,
+                  )
+                : !_controller.hasCompletedOnboarding
+                ? TopicSelectionScreen(
+                    key: const ValueKey('topic_selection_screen'),
+                    availableCategories: availableCategories,
+                    onComplete: _controller.completeOnboarding,
+                  )
                 : _controller.hasCompletedOnboarding
                 ? _controller.isLoggedIn || _controller.hasCompletedAuthGate
                       ? RootShell(
@@ -119,11 +131,7 @@ class _ZynAppState extends State<ZynApp> {
                                 );
                               },
                         )
-                : OnboardingScreen(
-                    key: const ValueKey('onboarding_screen'),
-                    availableCategories: availableCategories,
-                    onComplete: _controller.completeOnboarding,
-                  ),
+                : const SizedBox.shrink(),
           ),
         );
       },

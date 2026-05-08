@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/app_theme.dart';
-import '../widgets/zyn_logo.dart';
 
 enum _AuthMode { masuk, daftar }
 
@@ -38,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _hidePassword = true;
+  bool _isOpeningExternalAuth = false;
   _AuthMode _mode = _AuthMode.masuk;
 
   @override
@@ -84,56 +85,27 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.of(context).maybePop();
   }
 
-  Future<_SocialProfileResult?> _showGoogleAccountSheet() {
-    return showModalBottomSheet<_SocialProfileResult>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => const _GoogleAccountSheet(),
-    );
-  }
-
-  Future<_SocialProfileResult?> _showFacebookSheet() {
-    return showModalBottomSheet<_SocialProfileResult>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => const _FacebookContinueSheet(),
-    );
-  }
-
   Future<void> _handleSocialAuth(_SocialProvider provider) async {
     final messenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-    final result = provider == _SocialProvider.google
-        ? await _showGoogleAccountSheet()
-        : await _showFacebookSheet();
+    setState(() => _isOpeningExternalAuth = true);
 
-    if (result == null) {
-      return;
-    }
-
-    widget.onLogin(
-      name: result.displayName,
-      username: result.username,
-      email: result.email,
-      password: '${provider.id}-auth',
-    );
+    final uri = Uri.parse(provider.url);
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
 
     if (!mounted) {
       return;
     }
 
+    setState(() => _isOpeningExternalAuth = false);
     messenger.showSnackBar(
       SnackBar(
         content: Text(
-          provider == _SocialProvider.google
-              ? 'Simulasi pemilihan akun Google berhasil.'
-              : 'Simulasi login Facebook berhasil.',
+          opened
+              ? 'Membuka ${provider.label}. Selesaikan login di layanan resmi.'
+              : 'Gagal membuka ${provider.label}. Coba lagi nanti.',
         ),
       ),
     );
-    navigator.maybePop();
   }
 
   @override
@@ -186,38 +158,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: <Color>[
-                        Color(0xFF0F5EEA),
-                        Color(0xFF1798FF),
-                        Color(0xFF2EC5FF),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
+                Text(
+                  _isRegisterMode ? 'Buat akun ZYN' : 'Masuk ke akun ZYN',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const ZynLogo(size: 48, radius: 14, showPlate: true),
-                      const SizedBox(height: 18),
-                      Text(
-                        'Masuk ke ZYN',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Baca berita real-time, simpan artikel penting, dan nikmati pengalaman mobile news yang lebih personal.',
-                        style: TextStyle(color: Colors.white70, height: 1.5),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isRegisterMode
+                      ? 'Daftar untuk menyimpan berita, preferensi topik, dan pengalaman baca yang lebih personal.'
+                      : 'Masuk untuk membuka simpanan, notifikasi, dan kurasi berita yang lebih relevan.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.textTheme.bodySmall?.color,
+                    height: 1.5,
                   ),
                 ),
                 const SizedBox(height: 22),
@@ -265,8 +219,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 6),
                         Text(
                           _isRegisterMode
-                              ? 'Buat akun untuk sinkronisasi simpanan, preferensi, dan pengalaman baca lintas sesi.'
-                              : 'Gunakan akunmu untuk membuka simpanan, notifikasi, dan kurasi berita yang lebih relevan.',
+                              ? 'Isi data inti agar akunmu siap dipakai di semua sesi.'
+                              : 'Gunakan akun yang sudah pernah kamu pakai sebelumnya.',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.textTheme.bodySmall?.color,
                             height: 1.45,
@@ -278,11 +232,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             controller: _nameController,
                             textInputAction: TextInputAction.next,
                             decoration: const InputDecoration(
-                              labelText: 'Nama tampilan',
+                              labelText: 'Nama lengkap',
                             ),
                             validator: (value) {
                               if (value?.trim().isEmpty ?? true) {
-                                return 'Nama tampilan wajib diisi';
+                                return 'Nama lengkap wajib diisi';
                               }
                               return null;
                             },
@@ -380,16 +334,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 _SocialAuthButton(
-                  label: 'Masuk dengan Google',
-                  subtitle: 'Simulasi pemilihan akun Google',
+                  label: 'Lanjutkan dengan Google',
+                  subtitle: 'Membuka halaman resmi akun Google',
                   badge: const _GoogleBadge(),
+                  busy: _isOpeningExternalAuth,
                   onTap: () => _handleSocialAuth(_SocialProvider.google),
                 ),
                 const SizedBox(height: 12),
                 _SocialAuthButton(
-                  label: 'Masuk dengan Facebook',
-                  subtitle: 'Simulasi membuka halaman Facebook',
+                  label: 'Lanjutkan dengan Facebook',
+                  subtitle: 'Membuka halaman resmi Facebook',
                   badge: const _FacebookBadge(),
+                  busy: _isOpeningExternalAuth,
                   onTap: () => _handleSocialAuth(_SocialProvider.facebook),
                 ),
                 const SizedBox(height: 18),
@@ -485,19 +441,21 @@ class _SocialAuthButton extends StatelessWidget {
     required this.subtitle,
     required this.badge,
     required this.onTap,
+    required this.busy,
   });
 
   final String label;
   final String subtitle;
   final Widget badge;
   final VoidCallback onTap;
+  final bool busy;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return OutlinedButton(
-      onPressed: onTap,
+      onPressed: busy ? null : onTap,
       style: OutlinedButton.styleFrom(
         backgroundColor: theme.colorScheme.surface,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
@@ -526,7 +484,14 @@ class _SocialAuthButton extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded),
+          if (busy)
+            const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2.2),
+            )
+          else
+            const Icon(Icons.open_in_new_rounded),
         ],
       ),
     );
@@ -547,19 +512,12 @@ class _GoogleBadge extends StatelessWidget {
         border: Border.all(color: Colors.black12),
       ),
       alignment: Alignment.center,
-      child: RichText(
-        text: const TextSpan(
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-          children: [
-            TextSpan(
-              text: 'G',
-              style: TextStyle(color: Color(0xFF4285F4)),
-            ),
-            TextSpan(
-              text: '',
-              style: TextStyle(color: Color(0xFFEA4335)),
-            ),
-          ],
+      child: const Text(
+        'G',
+        style: TextStyle(
+          color: Color(0xFF4285F4),
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -591,161 +549,25 @@ class _FacebookBadge extends StatelessWidget {
   }
 }
 
-class _GoogleAccountSheet extends StatelessWidget {
-  const _GoogleAccountSheet();
-
-  @override
-  Widget build(BuildContext context) {
-    final accounts = <_SocialProfileResult>[
-      const _SocialProfileResult(
-        displayName: 'Nadia Putri',
-        username: 'nadiaputri',
-        email: 'nadia.putri@gmail.com',
-      ),
-      const _SocialProfileResult(
-        displayName: 'Raka Fajar',
-        username: 'rakafajar',
-        email: 'raka.fajar@gmail.com',
-      ),
-    ];
-
-    return _SocialSheetContainer(
-      title: 'Pilih akun Google',
-      subtitle:
-          'Simulasi ini meniru pemilihan akun Google seperti di aplikasi asli.',
-      child: Column(
-        children: accounts
-            .map(
-              (account) => ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const _GoogleBadge(),
-                title: Text(account.displayName),
-                subtitle: Text(account.email),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => Navigator.of(context).pop(account),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-}
-
-class _FacebookContinueSheet extends StatelessWidget {
-  const _FacebookContinueSheet();
-
-  @override
-  Widget build(BuildContext context) {
-    const profile = _SocialProfileResult(
-      displayName: 'Alya Zhafira',
-      username: 'alyazhafira',
-      email: 'alya.zhafira@facebook.zyn.app',
-    );
-
-    return _SocialSheetContainer(
-      title: 'Facebook',
-      subtitle:
-          'Simulasi ini meniru membuka aplikasi atau halaman Facebook untuk melanjutkan login.',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(22),
-            ),
-            child: const Row(
-              children: [
-                _FacebookBadge(),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Lanjutkan sebagai Alya Zhafira',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(profile),
-            child: const Text('Lanjutkan dengan Facebook'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SocialSheetContainer extends StatelessWidget {
-  const _SocialSheetContainer({
-    required this.title,
-    required this.subtitle,
-    required this.child,
-  });
-
-  final String title;
-  final String subtitle;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-      ),
-      child: Material(
-        borderRadius: BorderRadius.circular(28),
-        clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 8),
-              Text(subtitle),
-              const SizedBox(height: 18),
-              child,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SocialProfileResult {
-  const _SocialProfileResult({
-    required this.displayName,
-    required this.username,
-    required this.email,
-  });
-
-  final String displayName;
-  final String username;
-  final String email;
-}
-
 enum _SocialProvider {
-  google(id: 'google', label: 'Google'),
-  facebook(id: 'facebook', label: 'Facebook');
+  google(
+    id: 'google',
+    label: 'Google',
+    url: 'https://accounts.google.com/signin/v2/identifier',
+  ),
+  facebook(
+    id: 'facebook',
+    label: 'Facebook',
+    url: 'https://www.facebook.com/login.php',
+  );
 
-  const _SocialProvider({required this.id, required this.label});
+  const _SocialProvider({
+    required this.id,
+    required this.label,
+    required this.url,
+  });
 
   final String id;
   final String label;
+  final String url;
 }
