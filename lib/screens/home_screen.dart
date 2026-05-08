@@ -19,6 +19,7 @@ class HomeScreen extends StatefulWidget {
     required this.onOpenNotifications,
     required this.onOpenForYou,
     required this.onOpenCategories,
+    required this.onOpenTopic,
   });
 
   final AppController controller;
@@ -28,6 +29,7 @@ class HomeScreen extends StatefulWidget {
   final VoidCallback onOpenNotifications;
   final VoidCallback onOpenForYou;
   final VoidCallback onOpenCategories;
+  final ValueChanged<String> onOpenTopic;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -173,8 +175,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: SizedBox(
                   height: compactLayout
-                      ? 236 + ((textScale - 1) * 54)
-                      : 254 + ((textScale - 1) * 48),
+                      ? 252 + ((textScale - 1) * 56)
+                      : 268 + ((textScale - 1) * 52),
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: curatedItems.length,
@@ -213,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         (label) => _TopicCard(
                           label: label,
                           icon: _topicIcons[label] ?? Icons.newspaper_rounded,
-                          onTap: widget.onOpenCategories,
+                          onTap: () => widget.onOpenTopic(label),
                         ),
                       )
                       .toList(),
@@ -227,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 110),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 132),
               sliver: SliverList.builder(
                 itemCount: latest.length,
                 itemBuilder: (context, index) {
@@ -816,21 +818,13 @@ class _CuratedCard extends StatelessWidget {
                         item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                    style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
                           height: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Expanded(
-                        child: Text(
-                          item.description,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(height: 1.35),
-                        ),
-                      ),
+                      const Spacer(),
                       const SizedBox(height: 10),
                       Text(
                         '${item.author} | ${item.readMinutes} menit baca',

@@ -9,10 +9,12 @@ class CategoryScreen extends StatefulWidget {
     super.key,
     required this.news,
     required this.onOpenDetail,
+    this.initialCategory,
   });
 
   final List<NewsItem> news;
   final ValueChanged<NewsItem> onOpenDetail;
+  final String? initialCategory;
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -24,7 +26,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedCategory = 'Semua';
+    _selectedCategory = widget.initialCategory?.trim().isNotEmpty == true
+        ? widget.initialCategory!.trim()
+        : 'Semua';
   }
 
   @override
@@ -33,6 +37,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
       'Semua',
       ...widget.news.map((item) => item.categoryLabel),
     }.toList();
+    if (!categories.contains(_selectedCategory)) {
+      _selectedCategory = 'Semua';
+    }
     final filtered = _selectedCategory == 'Semua'
         ? widget.news
         : widget.news

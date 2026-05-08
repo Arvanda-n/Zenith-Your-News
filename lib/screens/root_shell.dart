@@ -77,11 +77,14 @@ class _RootShellState extends State<RootShell> {
     );
   }
 
-  void _openCategories() {
+  void _openCategories([String? initialCategory]) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) =>
-            CategoryScreen(news: dummyNews, onOpenDetail: _openDetail),
+        builder: (_) => CategoryScreen(
+          news: dummyNews,
+          onOpenDetail: _openDetail,
+          initialCategory: initialCategory,
+        ),
       ),
     );
   }
@@ -168,6 +171,7 @@ class _RootShellState extends State<RootShell> {
         onOpenNotifications: _openNotifications,
         onOpenForYou: _openForYou,
         onOpenCategories: _openCategories,
+        onOpenTopic: _openCategories,
       ),
       TrendingScreen(
         controller: widget.controller,
