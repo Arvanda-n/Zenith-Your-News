@@ -17,27 +17,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _pageIndex = 0;
 
-  late final List<_OnboardingItem> _items = <_OnboardingItem>[
+  late final List<_OnboardingItem> _items = [
     _OnboardingItem(
-      title: 'Selamat Datang di ZYN',
+      title: 'Berita Cepat, Tampilan Elegan',
       description:
-          'Nikmati pengalaman membaca berita yang lebih elegan, ringan, dan nyaman untuk ritme harianmu.',
+          'Baca headline terbaru dengan visual modern, ringan, dan nyaman untuk aktivitas harianmu.',
       imageUrl: dummyNews[0].imageUrl,
       imageHint: dummyNews[0].imageHint,
-      icon: Icons.waving_hand_rounded,
+      icon: Icons.auto_stories_rounded,
     ),
     _OnboardingItem(
-      title: 'Dapatkan Berita Real-Time',
+      title: 'Update Real-Time Setiap Saat',
       description:
-          'Headline penting, pembaruan cepat, dan visual premium hadir dalam satu aplikasi mobile-first.',
+          'Ikuti breaking news, tren utama, dan kabar penting dalam satu aplikasi yang rapi.',
       imageUrl: dummyNews[10].imageUrl,
       imageHint: dummyNews[10].imageHint,
       icon: Icons.bolt_rounded,
     ),
     _OnboardingItem(
-      title: 'Ikuti Trending News Setiap Hari',
+      title: 'Topik Trending Lebih Mudah Diikuti',
       description:
-          'Pantau topik yang sedang ramai dan mulai hari dengan feed berita yang terasa lebih relevan.',
+          'Temukan berita populer dan rekomendasi yang relevan dengan minatmu setiap hari.',
       imageUrl: dummyNews[25].imageUrl,
       imageHint: dummyNews[25].imageHint,
       icon: Icons.local_fire_department_rounded,
@@ -55,147 +55,133 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _goNext() {
     if (_isLastPage) {
       widget.onComplete();
-      return;
+    } else {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+      );
     }
-
-    _pageController.nextPage(
-      duration: const Duration(milliseconds: 360),
-      curve: Curves.easeOutCubic,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final media = MediaQuery.of(context);
-    final topPadding = media.padding.top + 12;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: <Color>[
-                  const Color(0xFFF7FAFF),
-                  AppTheme.primary.withValues(alpha: 0.05),
-                  theme.scaffoldBackgroundColor,
+      backgroundColor: const Color(0xFFF8FBFF),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.newspaper_rounded,
+                          color: AppTheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'ZYN News',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF0F172A),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: widget.onComplete,
+                    child: const Text('Lewati'),
+                  ),
                 ],
               ),
             ),
-          ),
-          Positioned(
-            top: topPadding,
-            left: 20,
-            right: 20,
-            child: Row(
-              children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.10),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.auto_stories_rounded,
-                    color: AppTheme.primary,
-                    size: 18,
-                  ),
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: widget.onComplete,
-                  icon: const Icon(Icons.skip_next_rounded),
-                  label: const Text('Lewati'),
-                ),
-              ],
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: _items.length,
+                onPageChanged: (value) => setState(() => _pageIndex = value),
+                itemBuilder: (context, index) {
+                  return _OnboardingPage(
+                    item: _items[index],
+                    isActive: index == _pageIndex,
+                  );
+                },
+              ),
             ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: _items.length,
-                    onPageChanged: (value) =>
-                        setState(() => _pageIndex = value),
-                    itemBuilder: (context, index) {
-                      return _OnboardingPage(
-                        item: _items[index],
-                        isActive: index == _pageIndex,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(_items.length, (index) {
+                      final active = index == _pageIndex;
+
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        width: active ? 28 : 9,
+                        height: 9,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(999),
+                          color: active
+                              ? AppTheme.primary
+                              : const Color(0xFFD5E3F5),
+                        ),
                       );
-                    },
+                    }),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 26),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(_items.length, (index) {
-                          final active = index == _pageIndex;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 220),
-                            margin: const EdgeInsets.symmetric(horizontal: 5),
-                            width: active ? 26 : 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: active
-                                  ? AppTheme.primary
-                                  : Colors.black.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(999),
-                              boxShadow: active
-                                  ? <BoxShadow>[
-                                      BoxShadow(
-                                        color: AppTheme.primary.withValues(
-                                          alpha: 0.18,
-                                        ),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: 18),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: _goNext,
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size.fromHeight(64),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            elevation: 8,
-                            shadowColor: AppTheme.primary.withValues(
-                              alpha: 0.24,
-                            ),
-                          ),
-                          child: Text(
-                            _isLastPage ? 'Mulai Sekarang' : 'Selanjutnya',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                  const SizedBox(height: 22),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 58,
+                    child: FilledButton(
+                      onPressed: _goNext,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(22),
                         ),
                       ),
-                    ],
+                      child: Text(
+                        _isLastPage ? 'Mulai Membaca' : 'Selanjutnya',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -209,211 +195,155 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 260),
-      opacity: isActive ? 1 : 0.82,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final compact = constraints.maxHeight < 640;
-          final horizontalPadding = constraints.maxWidth < 360 ? 20.0 : 24.0;
+    final theme = Theme.of(context);
 
-          return Stack(
-            children: [
-              Positioned.fill(child: _HeroVisual(item: item)),
-              Positioned(
-                top: compact ? 92 : 108,
-                left: horizontalPadding,
-                right: horizontalPadding,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 9,
-                      ),
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 280),
+      opacity: isActive ? 1 : 0.65,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+        child: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned.fill(
+                    child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.88),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(
-                          color: AppTheme.primary.withValues(alpha: 0.08),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(item.icon, color: AppTheme.primary, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            'News Daily Brief',
-                            style: Theme.of(context).textTheme.labelLarge
-                                ?.copyWith(
-                                  color: AppTheme.primary,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                        borderRadius: BorderRadius.circular(36),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primary.withValues(alpha: 0.16),
+                            blurRadius: 32,
+                            offset: const Offset(0, 18),
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: compact ? 18 : 24),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 320),
-                      child: Text(
-                        item.title,
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              height: 1.05,
-                              color: const Color(0xFF0E1726),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(36),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            NewsImage(
+                              imageUrl: item.imageUrl,
+                              imageHint: item.imageHint,
+                              borderRadius: BorderRadius.circular(36),
                             ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 320),
-                      child: Text(
-                        item.description,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: const Color(
-                            0xFF364152,
-                          ).withValues(alpha: 0.82),
-                          height: 1.55,
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withValues(alpha: 0.10),
+                                    Colors.black.withValues(alpha: 0.55),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Positioned(
+                    top: 18,
+                    left: 18,
+                    child: _GlassBadge(icon: item.icon),
+                  ),
+                  Positioned(right: -10, bottom: 32, child: _FloatingCard()),
+                ],
               ),
-            ],
-          );
-        },
+            ),
+            const SizedBox(height: 34),
+            Expanded(
+              flex: 4,
+              child: Column(
+                children: [
+                  Text(
+                    item.title,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      height: 1.12,
+                      color: const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    item.description,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      height: 1.55,
+                      color: const Color(0xFF64748B),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _HeroVisual extends StatelessWidget {
-  const _HeroVisual({required this.item});
+class _GlassBadge extends StatelessWidget {
+  const _GlassBadge({required this.icon});
 
-  final _OnboardingItem item;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: NewsImage(
-            imageUrl: item.imageUrl,
-            imageHint: item.imageHint,
-            borderRadius: BorderRadius.zero,
-          ),
-        ),
-        Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: const <double>[0.0, 0.20, 0.42, 0.68, 1.0],
-                colors: <Color>[
-                  const Color(0xFFF7FAFF),
-                  const Color(0xFFF7FAFF).withValues(alpha: 0.96),
-                  const Color(0xFFF7FAFF).withValues(alpha: 0.74),
-                  const Color(0xFFF7FAFF).withValues(alpha: 0.20),
-                  const Color(0xFFF7FAFF).withValues(alpha: 0.06),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: const <double>[0.0, 0.56, 0.86, 1.0],
-                colors: <Color>[
-                  AppTheme.primary.withValues(alpha: 0.04),
-                  Colors.transparent,
-                  AppTheme.primary.withValues(alpha: 0.05),
-                  AppTheme.primary.withValues(alpha: 0.08),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 24,
-          top: 36,
-          child: _AccentBubble(icon: item.icon, angle: -0.14, size: 88),
-        ),
-        Positioned(
-          right: 26,
-          top: 44,
-          child: _AccentBubble(
-            icon: Icons.auto_awesome_rounded,
-            angle: 0.14,
-            size: 52,
-            filled: false,
-          ),
-        ),
-        Positioned(
-          right: 82,
-          top: 122,
-          child: _AccentBubble(
-            icon: Icons.bolt_rounded,
-            angle: -0.08,
-            size: 42,
-            filled: false,
-          ),
-        ),
-      ],
+    return Container(
+      width: 54,
+      height: 54,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.88),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+      ),
+      child: Icon(icon, color: AppTheme.primary, size: 26),
     );
   }
 }
 
-class _AccentBubble extends StatelessWidget {
-  const _AccentBubble({
-    required this.icon,
-    required this.angle,
-    required this.size,
-    this.filled = true,
-  });
-
-  final IconData icon;
-  final double angle;
-  final double size;
-  final bool filled;
-
+class _FloatingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: angle,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: filled
-              ? Colors.white.withValues(alpha: 0.86)
-              : AppTheme.primary.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(size * 0.32),
-          border: Border.all(
-            color: AppTheme.primary.withValues(alpha: filled ? 0.08 : 0.16),
+    return Container(
+      width: 132,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppTheme.primary.withValues(alpha: 0.10),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+        ],
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.trending_up_rounded, color: Color(0xFF06B6D4), size: 22),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Trending',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 13,
+                color: Color(0xFF0F172A),
+              ),
             ),
-          ],
-        ),
-        child: Icon(
-          icon,
-          size: size * 0.36,
-          color: AppTheme.primary.withValues(alpha: 0.84),
-        ),
+          ),
+        ],
       ),
     );
   }

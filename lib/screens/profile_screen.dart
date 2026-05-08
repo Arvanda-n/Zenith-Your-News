@@ -290,10 +290,17 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Future<void> _pickProfilePhoto(BuildContext context) async {
+    await _pickProfilePhotoFromSource(context, ImageSource.gallery);
+  }
+
+  Future<void> _pickProfilePhotoFromSource(
+    BuildContext context,
+    ImageSource source,
+  ) async {
     try {
       final picker = ImagePicker();
       final file = await picker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         imageQuality: 88,
         maxWidth: 1800,
       );
@@ -307,7 +314,13 @@ class ProfileScreen extends StatelessWidget {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Foto profil berhasil diperbarui.')),
+        SnackBar(
+          content: Text(
+            source == ImageSource.camera
+                ? 'Foto profil dari kamera berhasil diperbarui.'
+                : 'Foto profil berhasil diperbarui.',
+          ),
+        ),
       );
     } catch (_) {
       if (!context.mounted) {
@@ -333,6 +346,17 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_camera_rounded),
+                  title: const Text('Ambil dengan kamera'),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _pickProfilePhotoFromSource(
+                      parentContext,
+                      ImageSource.camera,
+                    );
+                  },
+                ),
                 ListTile(
                   leading: const Icon(Icons.photo_library_rounded),
                   title: const Text('Pilih dari galeri'),
