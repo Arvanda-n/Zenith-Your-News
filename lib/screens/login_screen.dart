@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/app_theme.dart';
@@ -39,6 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _hidePassword = true;
   bool _isOpeningExternalAuth = false;
+  bool _isGoogleSigningIn = false;
   _AuthMode _mode = _AuthMode.masuk;
 
   @override
@@ -86,6 +88,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleSocialAuth(_SocialProvider provider) async {
+    if (provider == _SocialProvider.google) {
+      await _handleGoogleSignIn();
+      return;
+    }
+
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _isOpeningExternalAuth = true);
 
@@ -106,6 +113,53 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isGoogleSigningIn = true);
+
+    try {
+      final googleSignIn = GoogleSignIn(
+        scopes: const <String>['email', 'profile'],
+      );
+      await googleSignIn.signOut();
+      final account = await googleSignIn.signIn();
+
+      if (!mounted || account == null) {
+        return;
+      }
+
+      widget.onLogin(
+        email: account.email,
+        password: 'google-oauth',
+        name: account.displayName ?? account.email.split('@').first,
+        username: account.email.split('@').first,
+      );
+
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Masuk dengan Google berhasil. Selamat datang, ${account.displayName ?? 'Pembaca ZYN'}.',
+          ),
+        ),
+      );
+      Navigator.of(context).maybePop();
+    } catch (error) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '$error'.toLowerCase().contains('canceled')
+                ? 'Login Google dibatalkan.'
+                : 'Login Google belum berhasil. Detail: $error',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isGoogleSigningIn = false);
+      }
+    }
   }
 
   @override
@@ -335,9 +389,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 _SocialAuthButton(
                   label: 'Lanjutkan dengan Google',
-                  subtitle: 'Membuka halaman resmi akun Google',
+                  subtitle: 'Masuk langsung dengan akun Google di perangkat',
                   badge: const _GoogleBadge(),
-                  busy: _isOpeningExternalAuth,
+                  busy: _isGoogleSigningIn,
                   onTap: () => _handleSocialAuth(_SocialProvider.google),
                 ),
                 const SizedBox(height: 12),
