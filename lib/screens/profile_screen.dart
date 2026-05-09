@@ -52,6 +52,7 @@ class ProfileScreen extends StatelessWidget {
                         _ProfileAvatar(
                           isLoggedIn: isLoggedIn,
                           photoPath: controller.userPhotoPath,
+                          photoScale: controller.userPhotoScale,
                           name: controller.userName,
                           onEditPhoto: isLoggedIn
                               ? () => _showPhotoOptions(context)
@@ -134,7 +135,7 @@ class ProfileScreen extends StatelessWidget {
                               label: Text(
                                 controller.userPhotoPath == null
                                     ? 'Tambah foto'
-                                    : 'Ganti foto',
+                                    : 'Kelola foto',
                               ),
                             ),
                           ),
@@ -269,8 +270,12 @@ class ProfileScreen extends StatelessWidget {
               SafeArea(
                 top: false,
                 child: FilledButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (isLoggedIn) {
+                      final confirmed = await _showLogoutConfirmation(context);
+                      if (confirmed != true || !context.mounted) {
+                        return;
+                      }
                       controller.logout();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Berhasil keluar.')),
@@ -365,14 +370,27 @@ class ProfileScreen extends StatelessWidget {
                     await _pickProfilePhoto(parentContext);
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.delete_outline_rounded),
-                  title: const Text('Hapus foto profil'),
-                  onTap: () {
-                    controller.updateProfilePhotoPath(null);
-                    Navigator.of(context).pop();
-                  },
-                ),
+                if (controller.userPhotoPath != null) ...[
+                  ListTile(
+                    leading: const Icon(Icons.zoom_in_map_rounded),
+                    title: const Text('Atur ukuran foto'),
+                    subtitle: const Text(
+                      'Sesuaikan zoom agar foto profil tampil lebih pas.',
+                    ),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await _showPhotoAdjustSheet(parentContext);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.delete_outline_rounded),
+                    title: const Text('Hapus foto profil'),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await _confirmRemovePhoto(parentContext);
+                    },
+                  ),
+                ],
               ],
             ),
           ),
@@ -391,18 +409,164 @@ class ProfileScreen extends StatelessWidget {
       },
     );
   }
+
+  Future<void> _showPhotoAdjustSheet(BuildContext context) async {
+    final parentContext = context;
+    var draftScale = controller.userPhotoScale;
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Atur ukuran foto profil',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Geser untuk memperbesar atau mengembalikan framing foto profil.',
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: _ProfileAvatarPreview(
+                        photoPath: controller.userPhotoPath,
+                        photoScale: draftScale,
+                        name: controller.userName,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Zoom ${(draftScale * 100).round()}%',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    Slider(
+                      value: draftScale,
+                      min: 1.0,
+                      max: 1.8,
+                      divisions: 8,
+                      label: '${(draftScale * 100).round()}%',
+                      onChanged: (value) =>
+                          setModalState(() => draftScale = value),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () =>
+                                setModalState(() => draftScale = 1.0),
+                            child: const Text('Reset'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () {
+                              controller.updateProfilePhotoScale(draftScale);
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(parentContext).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Ukuran foto profil berhasil diperbarui.',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text('Simpan'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _confirmRemovePhoto(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Hapus foto profil?'),
+          content: const Text(
+            'Foto profil akan dihapus dari tampilan profil dan ukuran fotonya direset.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Hapus'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !context.mounted) {
+      return;
+    }
+
+    controller.updateProfilePhotoPath(null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Foto profil berhasil dihapus.')),
+    );
+  }
+
+  Future<bool?> _showLogoutConfirmation(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Keluar dari akun?'),
+          content: const Text(
+            'Anda akan keluar dari sesi saat ini. Bookmark akun dan data profil lokal akan dibersihkan.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Keluar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _ProfileAvatar extends StatelessWidget {
   const _ProfileAvatar({
     required this.isLoggedIn,
     required this.photoPath,
+    required this.photoScale,
     required this.name,
     required this.onEditPhoto,
   });
 
   final bool isLoggedIn;
   final String? photoPath;
+  final double photoScale;
   final String? name;
   final VoidCallback onEditPhoto;
 
@@ -424,10 +588,15 @@ class _ProfileAvatar extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(28),
             child: hasPhoto
-                ? Image.file(
-                    File(photoPath!),
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => _AvatarFallback(name: name),
+                ? Transform.scale(
+                    scale: photoScale,
+                    child: Image.file(
+                      File(photoPath!),
+                      fit: BoxFit.cover,
+                      width: 84,
+                      height: 84,
+                      errorBuilder: (_, _, _) => _AvatarFallback(name: name),
+                    ),
                   )
                 : _AvatarFallback(
                     name: isLoggedIn ? name : null,
@@ -467,6 +636,48 @@ class _ProfileAvatar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ProfileAvatarPreview extends StatelessWidget {
+  const _ProfileAvatarPreview({
+    required this.photoPath,
+    required this.photoScale,
+    required this.name,
+  });
+
+  final String? photoPath;
+  final double photoScale;
+  final String? name;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasPhoto = photoPath != null && photoPath!.isNotEmpty;
+
+    return Container(
+      width: 124,
+      height: 124,
+      decoration: BoxDecoration(
+        gradient: AppTheme.brandGradient,
+        borderRadius: BorderRadius.circular(36),
+      ),
+      padding: const EdgeInsets.all(10),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: hasPhoto
+            ? Transform.scale(
+                scale: photoScale,
+                child: Image.file(
+                  File(photoPath!),
+                  fit: BoxFit.cover,
+                  width: 104,
+                  height: 104,
+                  errorBuilder: (_, _, _) => _AvatarFallback(name: name),
+                ),
+              )
+            : _AvatarFallback(name: name),
+      ),
     );
   }
 }

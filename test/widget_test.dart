@@ -67,6 +67,7 @@ void main() {
         'user_email': 'nadia@zyn.app',
         'user_bio': 'Editor teknologi dan tren digital.',
         'user_photo_path': 'storage/emulated/0/Pictures/nadia.png',
+        'user_photo_scale': 1.4,
         'preferred_categories': <String>['Teknologi', 'Bisnis'],
       });
 
@@ -85,6 +86,7 @@ void main() {
       expect(controller.userEmail, 'nadia@zyn.app');
       expect(controller.userBio, 'Editor teknologi dan tren digital.');
       expect(controller.userPhotoPath, 'storage/emulated/0/Pictures/nadia.png');
+      expect(controller.userPhotoScale, 1.4);
       expect(
         controller.preferredCategories,
         containsAll(<String>['Teknologi', 'Bisnis']),
@@ -122,7 +124,33 @@ void main() {
       expect(controller.userEmail, isNull);
       expect(controller.userBio, isNull);
       expect(controller.userPhotoPath, isNull);
+      expect(controller.userPhotoScale, 1.0);
       expect(controller.bookmarks, isEmpty);
+    },
+  );
+
+  test(
+    'AppController menyimpan ukuran foto profil dan meresetnya saat logout',
+    () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+
+      final controller = AppController();
+      await controller.initialize();
+      controller.login(email: 'foto@zyn.app', password: 'rahasia123');
+      controller.updateProfilePhotoPath('/tmp/zyn-avatar.png');
+      controller.updateProfilePhotoScale(1.6);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      expect(controller.userPhotoScale, 1.6);
+
+      final restored = AppController();
+      await restored.initialize();
+      expect(restored.userPhotoScale, 1.6);
+
+      restored.logout();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(restored.userPhotoPath, isNull);
+      expect(restored.userPhotoScale, 1.0);
     },
   );
 }

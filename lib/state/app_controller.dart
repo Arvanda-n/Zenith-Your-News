@@ -34,6 +34,7 @@ class AppController extends ChangeNotifier {
   static const _userEmailKey = 'user_email';
   static const _userBioKey = 'user_bio';
   static const _userPhotoPathKey = 'user_photo_path';
+  static const _userPhotoScaleKey = 'user_photo_scale';
   static const _lastSelectedTabKey = 'last_selected_tab';
   static const _bookmarksKey = 'bookmarks';
   static const _preferredCategoriesKey = 'preferred_categories';
@@ -54,6 +55,7 @@ class AppController extends ChangeNotifier {
   String? _userEmail;
   String? _userBio;
   String? _userPhotoPath;
+  double _userPhotoScale = 1.0;
   final Set<String> _bookmarks = <String>{};
   final Set<String> _preferredCategories = <String>{};
   List<AppNotification> _notifications = List<AppNotification>.from(
@@ -100,6 +102,7 @@ class AppController extends ChangeNotifier {
   String? get userEmail => _userEmail;
   String? get userBio => _userBio;
   String? get userPhotoPath => _userPhotoPath;
+  double get userPhotoScale => _userPhotoScale;
   List<AppNotification> get notifications => _notifications;
   Set<String> get preferredCategories => _preferredCategories;
   int get unreadNotificationCount =>
@@ -242,6 +245,7 @@ class AppController extends ChangeNotifier {
     _userEmail = null;
     _userBio = null;
     _userPhotoPath = null;
+    _userPhotoScale = 1.0;
     _bookmarks.clear();
     _persistState();
     notifyListeners();
@@ -273,6 +277,19 @@ class AppController extends ChangeNotifier {
     _userPhotoPath = (normalizedPath == null || normalizedPath.isEmpty)
         ? null
         : normalizedPath;
+    if (_userPhotoPath == null) {
+      _userPhotoScale = 1.0;
+    }
+    _persistState();
+    notifyListeners();
+  }
+
+  void updateProfilePhotoScale(double scale) {
+    if (!_isLoggedIn) {
+      return;
+    }
+
+    _userPhotoScale = scale.clamp(1.0, 1.8);
     _persistState();
     notifyListeners();
   }
@@ -346,6 +363,8 @@ class AppController extends ChangeNotifier {
       await preferences.setString(_userPhotoPathKey, _userPhotoPath!);
     }
 
+    await preferences.setDouble(_userPhotoScaleKey, _userPhotoScale);
+
     await preferences.setStringList(
       _notificationsKey,
       _notifications.map((item) => jsonEncode(item.toMap())).toList(),
@@ -378,6 +397,9 @@ class AppController extends ChangeNotifier {
     _userEmail = preferences.getString(_userEmailKey);
     _userBio = preferences.getString(_userBioKey);
     _userPhotoPath = preferences.getString(_userPhotoPathKey);
+    _userPhotoScale = _restorePhotoScale(
+      preferences.getDouble(_userPhotoScaleKey),
+    );
 
     _bookmarks
       ..clear()
@@ -407,6 +429,7 @@ class AppController extends ChangeNotifier {
       _userEmail = null;
       _userBio = null;
       _userPhotoPath = null;
+      _userPhotoScale = 1.0;
       _bookmarks.clear();
     }
   }
@@ -432,6 +455,13 @@ class AppController extends ChangeNotifier {
   int _restoreLastSelectedTab(int? value) {
     if (value == null || value < 0 || value > 3) {
       return 0;
+    }
+    return value;
+  }
+
+  double _restorePhotoScale(double? value) {
+    if (value == null || value < 1.0 || value > 1.8) {
+      return 1.0;
     }
     return value;
   }
