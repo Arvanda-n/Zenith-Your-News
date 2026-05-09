@@ -96,6 +96,14 @@ class _DetailScreenState extends State<DetailScreen> {
     return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
   }
 
+  String _buildInlineCaption() {
+    final caption = widget.item.inlineImageHint.trim();
+    if (caption.isEmpty) {
+      return 'Ilustrasi pendukung berita.';
+    }
+    return 'Ilustrasi: $caption.';
+  }
+
   @override
   Widget build(BuildContext context) {
     final related = widget.allNews
@@ -247,10 +255,11 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                         child: Text(
                           widget.item.description,
+                          textAlign: TextAlign.justify,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            height: 1.5,
+                            height: 1.6,
                           ),
                         ),
                       ),
@@ -264,10 +273,8 @@ class _DetailScreenState extends State<DetailScreen> {
                           children: [
                             Text(
                               paragraph,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                height: 1.85,
-                              ),
+                              textAlign: TextAlign.justify,
+                              style: const TextStyle(fontSize: 15, height: 1.8),
                             ),
                             const SizedBox(height: 18),
                             if (index == 1) ...[
@@ -285,10 +292,12 @@ class _DetailScreenState extends State<DetailScreen> {
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
-                                      'Visual pendukung laporan ${widget.item.categoryLabel.toLowerCase()} hari ini.',
+                                      _buildInlineCaption(),
                                       style: TextStyle(
                                         color: secondaryColor,
                                         fontSize: 13,
+                                        height: 1.45,
+                                        fontStyle: FontStyle.italic,
                                       ),
                                     ),
                                   ],

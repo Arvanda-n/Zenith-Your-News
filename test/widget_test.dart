@@ -76,6 +76,7 @@ void main() {
 
       expect(controller.themeMode, ThemeMode.light);
       expect(controller.fontScale, FontScaleOption.normal);
+      expect(controller.fontScale.factor, 0.9);
       expect(controller.notificationsEnabled, isFalse);
       expect(controller.isLoggedIn, isTrue);
       expect(controller.hasCompletedOnboarding, isTrue);
