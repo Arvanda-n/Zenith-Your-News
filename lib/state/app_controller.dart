@@ -6,10 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/app_notification.dart';
 
 enum FontScaleOption {
-  small(0.82, 'Kecil (0.82x)'),
-  normal(0.9, 'Normal (0.9x)'),
-  large(1.0, 'Besar (1.0x)'),
-  extraLarge(1.12, 'Sangat besar (1.12x)');
+  small(0.82, 'Kecil (0.9x)'),
+  normal(0.9, 'Normal (1x)'),
+  large(1.0, 'Besar (1.1x)'),
+  extraLarge(1.12, 'Sangat besar (1.2x)');
 
   const FontScaleOption(this.factor, this.label);
 
