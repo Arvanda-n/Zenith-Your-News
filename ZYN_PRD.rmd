@@ -1,0 +1,328 @@
+---
+title: "Product Requirements Document - ZYN"
+author: "Codex"
+date: "2026-05-09"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+# Ringkasan Produk
+
+## Latar Belakang
+
+ZYN (Zenith Your News) adalah aplikasi berita mobile berbasis Flutter dengan pendekatan modern, premium, clean, dan mobile-first. Produk ini dirancang untuk membantu pengguna menemukan berita relevan dengan cepat melalui pengalaman baca yang ringan, personal, dan nyaman secara visual.
+
+Versi produk saat ini sudah memiliki fondasi inti berupa onboarding, pemilihan topik, auth gate, persistence sesi, edit profil, foto profil, bookmark, notifikasi, serta direct topic navigation. Fokus lanjutan produk adalah memperhalus pengalaman inti membaca berita tanpa merusak fitur yang sudah stabil.
+
+## Visi Produk
+
+Menjadi aplikasi berita harian yang terasa cepat, elegan, dan personal, sehingga pengguna merasa selalu dekat dengan informasi penting tanpa kewalahan oleh antarmuka yang ramai.
+
+## Problem Statement
+
+Pengguna aplikasi berita sering menghadapi beberapa masalah:
+
+- Antarmuka terlalu padat dan melelahkan untuk dibaca berulang.
+- Berita penting sulit ditemukan cepat karena hierarki konten kurang jelas.
+- Personalisasi minat sering terasa dangkal atau tidak konsisten.
+- Pengalaman lintas sesi kurang mulus ketika preferensi dan progres pengguna tidak tersimpan dengan baik.
+
+ZYN ingin menyelesaikan masalah ini dengan pengalaman baca yang fokus, premium, dan kontekstual sejak onboarding sampai konsumsi berita harian.
+
+# Tujuan Produk
+
+## Tujuan Utama
+
+- Menyediakan pengalaman baca berita yang cepat dan nyaman di perangkat mobile.
+- Menampilkan berita yang lebih relevan berdasarkan topik pilihan pengguna.
+- Menjaga konsistensi pengalaman antarlayar dengan visual premium dan bersih.
+- Meningkatkan retensi pengguna melalui persistence, personalisasi, dan akses cepat ke konten penting.
+
+## Non-Goal
+
+- Bukan platform media sosial atau UGC.
+- Bukan agregator berita desktop-first.
+- Bukan sistem editorial CMS.
+- Belum fokus ke monetisasi, subscription, atau paywall di fase ini.
+
+# Target Pengguna
+
+## Persona Utama
+
+### 1. Pembaca Harian Mobile
+
+- Usia 18-35 tahun.
+- Membaca berita singkat beberapa kali sehari.
+- Mengutamakan kecepatan, visual rapi, dan headline yang mudah dipindai.
+
+### 2. Pembaca Minat Spesifik
+
+- Memiliki preferensi topik seperti teknologi, bisnis, olahraga, atau kesehatan.
+- Ingin langsung masuk ke kategori yang relevan tanpa harus mencari manual.
+
+### 3. Pengguna Kasual yang Ingin Ringkas
+
+- Tidak selalu login, tetapi ingin aplikasi tetap mengingat preferensi dasar.
+- Menyukai alur yang sederhana tanpa terlalu banyak langkah.
+
+# Prinsip Produk
+
+- Mobile-first: semua alur utama harus nyaman di layar ponsel.
+- Premium clarity: tampilan terasa modern dan elegan, tetapi tetap fungsional.
+- Fast to value: pengguna harus cepat menemukan nilai sejak layar awal.
+- Safe iteration: fitur stabil tidak diubah tanpa alasan yang jelas.
+- Personal by default: pengalaman harus terasa lebih relevan setelah pengguna memilih minat.
+
+# Ruang Lingkup Fitur
+
+## Fitur yang Sudah Ada
+
+### Onboarding dan Discovery
+
+- Intro/onboarding multi-step.
+- Pemilihan topik favorit pengguna.
+- Akses lanjut ke auth gate setelah onboarding.
+
+### Auth dan Session
+
+- Login dasar.
+- Auth gate yang dapat dilewati.
+- Persistence sesi login.
+- Penyimpanan tab terakhir yang dibuka.
+
+### Personalisasi
+
+- Penyimpanan kategori/topik favorit.
+- Bookmark artikel.
+- Pengaturan ukuran font.
+- Toggle mode gelap.
+- Toggle notifikasi.
+
+### Profil
+
+- Edit nama, username, dan bio.
+- Tambah/ganti/hapus foto profil.
+- Informasi sesi dan preferensi pengguna.
+
+### Konsumsi Konten
+
+- Home screen dengan hero headline, curated cards, topik, dan latest feed.
+- Navigasi langsung ke topik/kategori.
+- Halaman kategori untuk menjelajah artikel berdasarkan topik.
+- Detail berita.
+- Search.
+- Bookmark screen.
+- Trending screen.
+- Notification center dan notification detail.
+
+## Fitur Prioritas Fase Berikutnya
+
+### 1. Penguatan Discovery dan Relevansi
+
+- Tingkatkan kualitas ranking konten pada home dan category.
+- Berikan pembeda yang jelas antara headline utama, rekomendasi, dan berita terbaru.
+- Perjelas hubungan antara topik favorit dan konten yang ditampilkan.
+
+### 2. Penguatan Reading Experience
+
+- Pastikan tipografi dan hierarchy tetap nyaman pada berbagai ukuran font.
+- Jaga transisi antarlayar tetap ringan dan konsisten.
+- Kurangi noise visual yang tidak membantu keputusan baca.
+
+### 3. Penguatan Trust dan Continuity
+
+- Pastikan state penting tetap pulih setelah aplikasi dibuka ulang.
+- Pastikan status login, bookmark, notifikasi, dan preferensi tetap konsisten.
+
+# User Flow Inti
+
+## Flow Pengguna Baru
+
+1. Pengguna membuka aplikasi.
+2. Pengguna melihat intro/onboarding.
+3. Pengguna memilih topik favorit.
+4. Pengguna masuk ke auth gate.
+5. Pengguna bisa login atau melewati dulu.
+6. Pengguna masuk ke beranda dengan konten yang sudah diprioritaskan.
+
+## Flow Pengguna Kembali
+
+1. Pengguna membuka aplikasi lagi.
+2. Sistem memulihkan state lokal:
+   - onboarding selesai atau belum
+   - auth gate selesai atau belum
+   - tab terakhir
+   - login state
+   - bookmark
+   - preferensi topik
+   - notifikasi
+3. Pengguna langsung melanjutkan aktivitas terakhir dengan friction minimal.
+
+## Flow Membaca Berita
+
+1. Pengguna menemukan artikel dari home, kategori, trending, search, atau notifikasi.
+2. Pengguna membuka detail berita.
+3. Pengguna dapat menyimpan bookmark bila sudah login.
+4. Pengguna kembali ke alur browsing tanpa kehilangan konteks utama.
+
+# Kebutuhan Fungsional
+
+## Onboarding
+
+- Sistem harus menampilkan onboarding kepada pengguna baru.
+- Sistem harus mengizinkan pengguna melewati onboarding bila alur mendukung.
+- Sistem harus menyimpan status onboarding selesai.
+- Sistem harus menyimpan topik yang dipilih pengguna.
+
+## Auth Gate dan Login
+
+- Sistem harus mendukung login dengan email dan password.
+- Sistem harus mengizinkan pengguna melewati auth gate.
+- Sistem harus menyimpan status auth gate selesai.
+- Sistem harus membersihkan data sensitif saat logout.
+
+## Home dan Navigasi Konten
+
+- Sistem harus menampilkan hero/headline utama.
+- Sistem harus menampilkan konten yang diprioritaskan berdasarkan topik favorit bila tersedia.
+- Sistem harus menyediakan navigasi ke search, notifikasi, kategori, dan untuk-anda.
+- Sistem harus membuka kategori spesifik saat pengguna memilih topik dari home.
+
+## Category Browsing
+
+- Sistem harus menampilkan seluruh kategori yang tersedia.
+- Sistem harus mendukung filter kategori aktif.
+- Sistem harus bisa dibuka langsung dengan kategori awal tertentu.
+- Sistem harus menampilkan empty state bila tidak ada artikel.
+
+## Profil dan Preferensi
+
+- Sistem harus mendukung edit nama, username, dan bio.
+- Sistem harus mendukung unggah/ganti/hapus foto profil.
+- Sistem harus mendukung pengaturan tema, notifikasi, dan ukuran font.
+- Sistem harus menampilkan minat/topik yang dipilih pengguna.
+
+## Bookmark dan Notifikasi
+
+- Sistem harus membatasi bookmark ke pengguna login.
+- Sistem harus menyimpan bookmark lintas sesi.
+- Sistem harus menampilkan jumlah notifikasi belum dibaca.
+- Sistem harus mendukung membuka detail notifikasi dan menandai sudah dibaca.
+
+# Kebutuhan Non-Fungsional
+
+## Desain dan UX
+
+- UI harus konsisten dengan gaya modern, premium, clean.
+- Hierarki visual harus jelas pada layar kecil.
+- Aplikasi harus tetap nyaman pada mode terang dan gelap.
+- Ukuran font yang lebih besar tidak boleh merusak layout inti.
+
+## Performa
+
+- Navigasi utama harus terasa responsif.
+- Scroll pada home, kategori, dan daftar berita harus tetap halus.
+- Rebuild UI tidak boleh berlebihan pada layar inti.
+
+## Reliability
+
+- State penting harus dipersist secara lokal.
+- Data lama yang tidak valid harus memiliki fallback aman.
+- Logout harus membersihkan data akun dan bookmark yang terkait.
+
+## Maintainability
+
+- Perubahan baru harus menghindari regresi pada fitur stabil.
+- Setiap perubahan harus lolos `flutter analyze` dan `flutter test`.
+- Setiap perubahan harus melalui commit dan push ke branch utama bila memang menjadi update resmi.
+
+# Metrik Keberhasilan
+
+## Metrik Produk
+
+- Persentase pengguna yang menyelesaikan onboarding.
+- Persentase pengguna yang memilih minimal satu topik.
+- Rasio pengguna yang membuka detail berita dari home.
+- Rasio penggunaan bookmark oleh pengguna login.
+- Jumlah sesi ulang dalam 7 hari.
+
+## Metrik UX Teknis
+
+- Tidak ada error analisis statis pada build utama.
+- Seluruh widget/integration test yang ada lulus.
+- Tidak ada regressi besar pada alur onboarding, auth gate, dan navigasi tab.
+
+# Risiko dan Mitigasi
+
+## Risiko
+
+- Revisi visual dapat mengganggu layout yang sudah stabil.
+- Personalisasi dapat terasa tidak akurat bila sumber ranking terbatas.
+- Persistence dapat menyimpan state lama yang tidak kompatibel.
+- UI premium dapat menjadi terlalu berat jika efek visual berlebihan.
+
+## Mitigasi
+
+- Lakukan perubahan bertahap pada layar yang terisolasi.
+- Pertahankan logika inti saat hanya melakukan penyempurnaan UI.
+- Sediakan fallback aman untuk data persist lama.
+- Validasi setiap perubahan dengan `flutter analyze` dan `flutter test`.
+
+# Prioritas Implementasi
+
+## P0
+
+- Stabilitas onboarding, auth gate, home, category, profile, bookmark, notification.
+- Persistence state inti.
+- Direct topic navigation.
+
+## P1
+
+- Penyempurnaan hierarchy visual layar inti.
+- Penguatan relevance pada home dan category.
+- Penyempurnaan reading experience untuk berbagai ukuran font.
+
+## P2
+
+- Eksperimen personalisasi lanjutan.
+- Empty states dan microcopy yang lebih kaya.
+- Peningkatan metrik insight untuk perilaku baca.
+
+# Dependensi
+
+- Flutter
+- Shared Preferences
+- Image Picker
+- Sumber data berita/dummy content saat fase pengembangan
+
+# Open Questions
+
+- Apakah fase berikutnya akan tetap menggunakan sumber data lokal/dummy atau mulai integrasi API berita nyata?
+- Apakah bookmark dan notifikasi akan tetap lokal atau perlu sinkronisasi backend?
+- Apakah auth akan tetap ringan atau berkembang ke akun penuh dengan registrasi?
+- Apakah For You akan memakai rule-based ranking atau model rekomendasi yang lebih canggih?
+
+# Definisi Selesai
+
+Sebuah iterasi fitur dianggap selesai bila:
+
+- Kebutuhan fungsional utama terpenuhi.
+- Tidak merusak alur stabil yang sudah ada.
+- UI mengikuti arah visual ZYN.
+- `flutter analyze` lulus tanpa issue.
+- `flutter test` lulus.
+- Perubahan sudah dikomit dan didorong ke repo bila dikerjakan langsung pada codebase utama.
+
+# Lampiran Singkat
+
+## Status Produk Saat Dokumen Dibuat
+
+- Platform: Flutter mobile app
+- Fokus: aplikasi berita premium, clean, mobile-first
+- State utama sudah memiliki persistence
+- Home screen baru saja mengalami beberapa iterasi desain
+- Category browsing sudah ditingkatkan agar lebih konsisten dengan visual home
+

@@ -1,0 +1,229 @@
+---
+title: "Roadmap Produk ZYN"
+author: "Codex"
+date: "2026-05-09"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+# Ringkasan
+
+Dokumen ini memecah arah produk ZYN menjadi roadmap bertahap yang realistis untuk pengembangan aplikasi Flutter berita dengan fokus modern, premium, clean, dan mobile-first.
+
+Roadmap ini diturunkan dari PRD utama dan disusun agar tim dapat bergerak aman: menjaga fitur stabil, meningkatkan kualitas pengalaman baca, dan menambah fondasi produk tanpa loncatan yang terlalu berisiko.
+
+# Prinsip Eksekusi
+
+- Jangan ubah fitur stabil tanpa alasan kuat.
+- Utamakan peningkatan yang berdampak langsung pada experience membaca.
+- Semua perubahan harus lolos `flutter analyze` dan `flutter test`.
+- Setiap iterasi yang resmi masuk repo harus di-commit dan di-push.
+- Iterasi UI harus tetap sejalan dengan identitas ZYN: premium, clean, cepat, dan nyaman di mobile.
+
+# Status Saat Ini
+
+## Fondasi yang Sudah Ada
+
+- Onboarding
+- Pemilihan topik favorit
+- Auth gate
+- Persistence state lokal
+- Login dasar
+- Home screen premium
+- Category browsing
+- Bookmark
+- Search
+- Trending
+- Notification center
+- Edit profil dan foto profil
+- Direct topic navigation
+
+## Kondisi Produk
+
+- Arsitektur MVP sudah usable
+- Beberapa layar utama sudah mengalami iterasi desain
+- Fokus berikutnya sebaiknya bukan menambah fitur besar secara liar, tetapi memperkuat kualitas core experience
+
+# Sasaran Roadmap
+
+## Sasaran 1
+
+Membuat pengalaman discovery dan membaca terasa konsisten premium di semua layar utama.
+
+## Sasaran 2
+
+Memperkuat personalisasi dan continuity agar aplikasi terasa relevan lintas sesi.
+
+## Sasaran 3
+
+Merapikan fondasi teknis dan testing agar pengembangan berikutnya lebih aman.
+
+# Roadmap Bertahap
+
+## Fase 1 - Polishing Core Experience
+
+### Tujuan
+
+Menuntaskan kualitas layar inti yang paling sering disentuh pengguna.
+
+### Fokus
+
+- Konsistensi visual antar layar utama
+- Hierarki konten yang lebih jelas
+- Keterbacaan di berbagai ukuran font
+- Empty state dan microcopy yang lebih membantu
+
+### Area Pekerjaan
+
+- Home
+- Category
+- Trending
+- Search
+- Detail berita
+
+### Outcome yang Diharapkan
+
+- Pengguna lebih cepat memahami prioritas konten
+- Rasio buka artikel dari layar utama meningkat
+- Pengalaman antarhalaman terasa lebih menyatu
+
+## Fase 2 - Personalization and Retention
+
+### Tujuan
+
+Meningkatkan relevansi konten dan mendorong pengguna kembali membuka aplikasi.
+
+### Fokus
+
+- Ranking konten berdasarkan minat
+- Kurasi "Untuk Anda" yang lebih kuat
+- Pemulihan state yang lebih lengkap
+- Pemanfaatan notifikasi untuk re-engagement
+
+### Area Pekerjaan
+
+- App controller
+- For You
+- Notification flow
+- Bookmark experience
+- Session continuity
+
+### Outcome yang Diharapkan
+
+- Feed terasa lebih personal
+- Pengguna lebih sering kembali
+- Bookmark dan notifikasi terasa lebih berguna
+
+## Fase 3 - Trust, Scale, and Readiness
+
+### Tujuan
+
+Menyiapkan produk agar lebih siap berkembang ke data nyata dan arsitektur yang lebih matang.
+
+### Fokus
+
+- Pemisahan data source
+- Persiapan integrasi API
+- Penguatan test coverage
+- Penguatan observability dasar
+
+### Area Pekerjaan
+
+- Data layer
+- Model dan mapper
+- Test strategy
+- Error/fallback handling
+
+### Outcome yang Diharapkan
+
+- Aplikasi lebih siap migrasi dari dummy data ke backend nyata
+- Risiko regresi turun
+- Pengembangan fitur berikutnya lebih cepat dan aman
+
+# Timeline Rekomendasi
+
+## Sprint 1
+
+- Rapikan category, trending, dan search experience
+- Review ulang detail berita untuk hierarchy dan readability
+- Tambah task audit responsivitas ukuran font
+
+## Sprint 2
+
+- Perkuat halaman For You
+- Rapikan bookmark state dan microcopy login-required
+- Tingkatkan alur notification ke article/detail
+
+## Sprint 3
+
+- Mulai abstraksi data layer
+- Siapkan contract model untuk API masa depan
+- Tambah test untuk state restoration dan flow penting
+
+## Sprint 4
+
+- Finalisasi readiness untuk integrasi data nyata
+- Audit performa layar inti
+- Audit visual consistency akhir
+
+# Prioritas Detail
+
+## P0
+
+- Stabilitas alur onboarding, auth gate, home, category, profile
+- Persistence state
+- Testing dasar yang melindungi flow utama
+
+## P1
+
+- Penyempurnaan discovery
+- Peningkatan kualitas "Untuk Anda"
+- Perluasan coverage widget dan state test
+
+## P2
+
+- Integrasi backend/news API
+- Sinkronisasi akun lintas perangkat
+- Insight/analytics produk
+
+# Risiko Utama
+
+## Risiko Produk
+
+- Produk terlalu fokus visual namun kurang meningkatkan relevansi konten
+- Terlalu banyak eksperimen UI dapat merusak flow stabil
+
+## Risiko Teknis
+
+- Ketergantungan pada dummy data membuat beberapa keputusan ranking terlihat benar padahal belum siap produksi
+- State persistence makin kompleks jika struktur data berubah
+
+## Mitigasi
+
+- Lakukan perubahan kecil namun tuntas
+- Verifikasi setiap iterasi dengan analyze dan test
+- Tambah dokumentasi task sebelum implementasi besar
+
+# Definisi Selesai Per Fase
+
+## Fase 1 selesai jika
+
+- Layar inti sudah konsisten premium
+- Tidak ada masalah layout utama pada mode terang/gelap dan font scale
+- Analyze dan test selalu hijau
+
+## Fase 2 selesai jika
+
+- Pengguna melihat feed yang lebih relevan
+- Bookmark, For You, dan notifikasi terasa lebih terhubung
+- State pemulihan lintas sesi lebih mulus
+
+## Fase 3 selesai jika
+
+- Fondasi data layer lebih siap untuk API nyata
+- Test coverage untuk flow penting meningkat
+- Risiko regresi saat pengembangan lanjutan menurun
+

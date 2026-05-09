@@ -1,0 +1,317 @@
+---
+title: "Daftar Task Implementasi Flutter - ZYN"
+author: "Codex"
+date: "2026-05-09"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+# Ringkasan
+
+Dokumen ini memecah roadmap ZYN menjadi daftar task implementasi Flutter yang konkret. Fokusnya adalah task yang bisa langsung diambil tim secara bertahap tanpa mengganggu fitur yang sudah stabil.
+
+Setiap task dirancang agar:
+
+- cukup kecil untuk diimplementasikan bertahap
+- mudah diverifikasi
+- aman terhadap regresi
+- tetap selaras dengan gaya visual ZYN
+
+# Aturan Eksekusi
+
+- Jangan ubah fitur stabil tanpa alasan jelas.
+- Setiap perubahan harus menjalankan `flutter analyze`.
+- Setiap perubahan harus menjalankan `flutter test`.
+- Setiap perubahan resmi harus di-commit dan di-push.
+- Prioritaskan perubahan yang paling berdampak pada UX inti.
+
+# Backlog Implementasi
+
+## Epic A - Core Reading Experience
+
+### A1. Audit hierarchy home screen
+
+Tujuan:
+Memastikan pembeda antara hero utama, curated content, topik, dan berita terbaru tetap jelas.
+
+Task:
+
+- review spacing dan hierarchy section home
+- audit behavior pada font scale besar
+- audit density card di layar kecil
+- pastikan CTA search/notifikasi tetap mudah dijangkau
+
+Output:
+
+- perbaikan spacing atau typography bila diperlukan
+- catatan keputusan desain untuk home
+
+### A2. Penyempurnaan trending screen
+
+Tujuan:
+Membuat layar trending terasa setara kualitasnya dengan home dan category.
+
+Task:
+
+- audit layout header trending
+- perjelas urutan konten terpopuler
+- rapikan kartu artikel trending
+- tambahkan empty/fallback state yang konsisten
+
+Output:
+
+- UI trending yang lebih premium dan mudah dipindai
+
+### A3. Penyempurnaan search screen
+
+Tujuan:
+Memudahkan pengguna menemukan berita melalui pencarian dengan feedback yang jelas.
+
+Task:
+
+- audit field pencarian dan state kosong
+- perjelas hasil pencarian aktif vs belum ada input
+- rapikan daftar hasil agar konsisten dengan layar lain
+- evaluasi kebutuhan recent search lokal
+
+Output:
+
+- pengalaman pencarian yang lebih jelas dan rapi
+
+### A4. Audit detail screen
+
+Tujuan:
+Meningkatkan kenyamanan membaca artikel penuh.
+
+Task:
+
+- audit hierarchy headline, metadata, dan body
+- audit spacing untuk font scale besar
+- review affordance bookmark/share bila ada
+- cek transisi dari home/category/trending ke detail
+
+Output:
+
+- detail article yang lebih nyaman dibaca
+
+## Epic B - Personalization and Retention
+
+### B1. Penguatan halaman Untuk Anda
+
+Tujuan:
+Membuat halaman For You benar-benar terasa personal.
+
+Task:
+
+- review ranking berdasarkan preferred categories
+- kelompokkan konten yang relevan vs umum
+- tambahkan summary personal ringan
+- audit empty state jika preferensi belum kuat
+
+Output:
+
+- halaman For You yang lebih bernilai
+
+### B2. Penguatan bookmark experience
+
+Tujuan:
+Membuat bookmark lebih berguna dan jelas.
+
+Task:
+
+- audit tampilan daftar bookmark kosong
+- rapikan pesan login-required
+- evaluasi sort bookmark terbaru
+- perjelas metadata artikel tersimpan
+
+Output:
+
+- bookmark flow yang lebih mudah dipahami
+
+### B3. Penguatan notification flow
+
+Tujuan:
+Membuat notifikasi lebih terhubung dengan aktivitas membaca.
+
+Task:
+
+- audit badge count dan sinkronisasi read state
+- review detail notifikasi ke article terkait
+- rapikan copy untuk notifikasi kosong
+- audit CTA mark all as read
+
+Output:
+
+- pusat notifikasi yang lebih berguna
+
+## Epic C - Profile and Preferences
+
+### C1. Penyempurnaan profile screen
+
+Tujuan:
+Membuat profil terasa sebagai pusat identitas dan preferensi pengguna.
+
+Task:
+
+- audit hierarchy info akun dan preferensi
+- review layout avatar/edit profile untuk layar kecil
+- rapikan status sesi agar lebih mudah dipahami
+- evaluasi visual section minat pengguna
+
+Output:
+
+- profile screen lebih rapi dan informatif
+
+### C2. Penguatan preference persistence
+
+Tujuan:
+Menjamin theme, font scale, topik, dan sesi pulih dengan aman.
+
+Task:
+
+- review key persistence yang ada
+- tambah proteksi fallback jika data lama rusak
+- audit perilaku logout terhadap data akun
+- tambah test untuk skenario restore tambahan
+
+Output:
+
+- state restoration yang lebih aman
+
+## Epic D - Technical Foundation
+
+### D1. Refactor data source abstraction
+
+Tujuan:
+Menyiapkan jalur migrasi dari dummy data ke API nyata.
+
+Task:
+
+- identifikasi semua pemanggilan `dummyNews`
+- buat lapisan data source sederhana
+- pisahkan akses data dari screen sejauh yang aman
+- dokumentasikan titik integrasi API masa depan
+
+Output:
+
+- fondasi data yang lebih siap berkembang
+
+### D2. Penguatan test coverage
+
+Tujuan:
+Mengurangi risiko regresi saat iterasi UI dan state.
+
+Task:
+
+- tambah widget test untuk flow navigasi inti
+- tambah test state controller untuk bookmark/notifikasi
+- tambah test restore state pada edge case
+- audit test yang terlalu bergantung pada copy statis
+
+Output:
+
+- coverage flow penting meningkat
+
+### D3. Audit performa rebuild
+
+Tujuan:
+Menjaga layar inti tetap ringan dan responsif.
+
+Task:
+
+- audit penggunaan `AnimatedBuilder`
+- identifikasi widget yang bisa dibuat lebih stabil
+- cek potensi rebuild berlebih pada home dan shell
+- dokumentasikan optimasi yang aman dilakukan
+
+Output:
+
+- daftar optimasi performa prioritas
+
+# Rekomendasi Urutan Implementasi
+
+## Batch 1
+
+- A2 Penyempurnaan trending screen
+- A3 Penyempurnaan search screen
+- C1 Penyempurnaan profile screen ringan
+
+## Batch 2
+
+- A4 Audit detail screen
+- B2 Penguatan bookmark experience
+- B3 Penguatan notification flow
+
+## Batch 3
+
+- B1 Penguatan halaman Untuk Anda
+- C2 Penguatan preference persistence
+- D2 Penguatan test coverage
+
+## Batch 4
+
+- D1 Refactor data source abstraction
+- D3 Audit performa rebuild
+
+# Template Task Per Implementasi
+
+Gunakan format ini setiap kali mengambil task baru:
+
+## Nama Task
+
+### Tujuan
+
+Tuliskan dampak produk yang ingin dicapai.
+
+### File Terkait
+
+- `lib/...`
+- `test/...`
+
+### Langkah Implementasi
+
+- perubahan UI/state/data yang diperlukan
+- fallback yang harus dijaga
+- risiko regresi yang harus diperhatikan
+
+### Verifikasi Wajib
+
+- jalankan `flutter analyze`
+- jalankan `flutter test`
+- cek diff akhir
+- commit
+- push
+
+# Task Siap Ambil Berikutnya
+
+## Pilihan paling aman
+
+### 1. Penyempurnaan trending screen
+
+Alasan:
+Layar ini kemungkinan besar masih bisa dipoles tanpa menyentuh fondasi auth, onboarding, atau persistence.
+
+### 2. Penyempurnaan search screen
+
+Alasan:
+Nilai UX tinggi dan risiko terhadap flow inti relatif rendah.
+
+### 3. Penguatan bookmark empty/login state
+
+Alasan:
+Cakupan kecil, dampak jelas, dan mudah dites.
+
+# Definisi Selesai
+
+Sebuah task implementasi dianggap selesai bila:
+
+- perubahan memenuhi tujuan task
+- fitur stabil tidak rusak
+- `flutter analyze` lulus
+- `flutter test` lulus
+- perubahan sudah di-commit
+- perubahan sudah di-push
+
