@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.zyn_flutter_app"
+    namespace = "com.ti24a6.app21"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,8 +20,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.zyn_flutter_app"
+        applicationId = "com.ti24a6.app21"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
